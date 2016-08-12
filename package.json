@@ -1,0 +1,26 @@
+{
+  "name": "datejs",
+  "version": "1.0.0",
+  "description": "javascript Date Object extend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zbm2001/datajs.git"
+  },
+  "keywords": [
+    "js",
+    "javascript",
+    "date",
+    "extend",
+    "datejs"
+  ],
+  "author": "ZhouBaiMin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zbm2001/datajs/issues"
+  },
+  "homepage": "https://github.com/zbm2001/datajs#readme"
+}
