@@ -1,4 +1,5 @@
 node_modules/
 dist/
 .project
+.idea
 gulpfile.js
