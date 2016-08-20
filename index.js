@@ -32,13 +32,60 @@
     rDigitsG = /\d+/g,
     rPeriod = /^(last|past|next)([0-9]*)([dD]ays|[wW]eeks|[mM]onths|[qQ]uarters|[yY]ears|[cC]enturies)$/,
 
-  // 每月天数（平年）
+    // 每月天数（平年）
     perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-  // 每季度天数（平年）
-    perQuarterDays = [90, 91, 92, 92];
+    // 每季度天数（平年）
+    perQuarterDays = [90, 91, 92, 92],
+
+    toString = Object.prototype.toString;
 
   // 扩展日期类的原型方法
   Object.assign(Date.prototype, {
+
+    /**
+     * 设置日期对象的时间为 00:00:00 000
+     * @returns {number} 当前日期对象的毫秒数
+     */
+    setTimeToFirst: function () {
+      return this.setHour(0, 0, 0, 0);
+    },
+
+    /**
+     * 设置日期对象的时间为 23:59:59 999
+     * @returns {number} 当前日期对象的毫秒数
+     */
+    setTimeToLast: function () {
+      return this.setHour(23, 59, 59, 999);
+    },
+
+    /**
+     * 设置时间与目标日期对象的时间一致 hh:mm:ss SSS
+     * @param {Date} date
+     * @returns {number} 当前日期对象的毫秒数
+     */
+    setTimeToDate: function (date) {
+      return this.setHour(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+    },
+
+    /**
+     * 与另一个日期对象比较毫秒数大小
+     * @param {Date} date
+     * @returns {number} range{-1,0,1}
+     */
+    compareTo: function (date) {
+      if(Date.isDate(date)){
+        return this < date ? -1 : this > date ? 1 : 0;
+      }
+      throw new TypeError(date + "is not a Date object");
+    },
+
+    /**
+     * 复制一个日期对象
+     * @returns {Date}
+     */
+    clone: function () {
+      return new Date(this.getTime());
+    },
 
     /**
      * 获取当月份自然数
@@ -49,9 +96,9 @@
     },
 
     /**
-     * 设置当前时间对象的月份
+     * 设置当前日期对象的月份
      * @param {number} month 月份
-     * @returns {number} 当前时间对象的毫秒数
+     * @returns {number} 当前日期对象的毫秒数
      */
     setNaturalMonth: function (month) {
       month = Number(month);
@@ -523,6 +570,15 @@
   Object.assign(Date, {
 
     /**
+     * 判断是否为日期对象
+     * @param {Date} date
+     * @returns {boolean}
+     */
+    isDate: function (date) {
+      return toString.call(date) === '[object Date]';
+    },
+
+    /**
      * 获取某年每月天数的数组
      * @param {number} year 年份
      * @returns {Array.<number>}
@@ -667,7 +723,7 @@
     },
 
     /**
-     * 解析时段用语，返回起始和结束两个时间对象的数组
+     * 解析时段用语，返回起始和结束两个日期对象的数组
      * @param {string} period
      * @returns {Array.<Date>}
      */
@@ -681,44 +737,13 @@
 
     UTC_FORMAT: 'yyyy-MM-ddThh:mm:ss.SSSZ',
 
-    // 国际化
-    i18n: {
-      // 月份名称 i18n
-      MONTH_NAMES: {
-        en: 'January,February,March,April,May,June,July,August,September,October,November,December'.split(','),
-        zh: '一月,二月,三月,四月,五月,六月,七月,八月,九月,十月,十一月,十二月'.split(',')
-      },
-
-      // 时间单位名称 i18n
-      UNIT_NAME: {
-        en: {
-          "second": "second",
-          "minute": "minute",
-          "hour": "hour",
-          "day": "day",
-          "week": "week",
-          "month": "month",
-          "quarter": "quarter",
-          "year": "year",
-          "century": "century"
-        },
-        zh: {
-          "second": "秒",
-          "minute": "分钟",
-          "hour": "小时",
-          "day": "天",
-          "week": "周",
-          "month": "月",
-          "quarter": "季度",
-          "year": "年",
-          "century": "世纪"
-        }
-      }
-    },
-
     // Hash表：时间量词复数词对应原词
-    // 天、周、月、季度、年、世纪
-    PLURAL_CLASSIFIER: {
+    // 毫秒、秒、分钟、小时、天、周、月、季度、年、世纪
+    pluralClassifiers: {
+      millisecond: "millisecond",
+      seconds: "second",
+      minutes: "minute",
+      hours: "hour",
       days: "day",
       weeks: "week",
       months: "month",
@@ -727,12 +752,13 @@
       centuries: "century"
     },
 
+    // 匹配时段语句的正则表达式
     rPeriod: rPeriod
 
   });
 
   /**
-   * 解析时段用语，返回起始和结束两个时间对象的数组
+   * 解析时段用语，返回起始和结束两个日期对象的数组
    * @param {string} period
    * @returns {Array.<Date>} length{2}
    */
@@ -751,10 +777,10 @@
       number;
 
     // 设置开始时间为那天的 0 时计起
-    start0.setHours(0, 0, 0, 0);
+    start0.setTimeToFirst();
     start = start0;
     // 设置结束时间为那天的最后一毫秒截止
-    end2.setHours(23, 59, 59, 999);
+    end2.setTimeToLast();
     end = end2;
 
     switch (period) {
@@ -802,7 +828,7 @@
         // past10days, past4months...
         if (rPeriod.test(period) && (number = parseInt(RegExp.$2)) > 0) {
           classifierPlural = RegExp.$3;
-          if (classifier = Date.PLURAL_CLASSIFIER[classifierPlural]) {
+          if (classifier = Date.pluralClassifiers[classifierPlural]) {
 
             switch (RegExp.$1) {
               // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
