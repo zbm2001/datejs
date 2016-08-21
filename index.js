@@ -3,11 +3,11 @@
  * @name: datejs
  * @description: Javascript Date Object extend
  * @version: 1.0.0
- * @author: zbm2001@aliyun.com zhoubaimin@rongcapital.cn
+ * @author: zbm2001@aliyun.com
  * @date: 2016-08-15
- * @copyright: Copyright (c) 2008-2016, Rong data service, Inc. (http://ruixuesoft.com). All rights reserved.
+ * @copyright: Copyright (c) 2008-2016, Zhou Bai Min. (https://github.com/zbm2001). All rights reserved.
  * @license: See LICENSE and https://github.com/zbm2001/datejs/blob/master/LICENSE
- * @website: https://github.com/zbm2001/
+ * @website: https://github.com/zbm2001
  */
 
 (function () {
@@ -32,9 +32,9 @@
     rDigitsG = /\d+/g,
     rPeriod = /^(last|past|next)([0-9]*)([dD]ays|[wW]eeks|[mM]onths|[qQ]uarters|[yY]ears|[cC]enturies)$/,
 
-    // 每月天数（平年）
+  // 每月天数（平年）
     perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-    // 每季度天数（平年）
+  // 每季度天数（平年）
     perQuarterDays = [90, 91, 92, 92],
 
     toString = Object.prototype.toString;
@@ -63,7 +63,7 @@
      * @param {Date} date
      * @returns {number} 当前日期对象的毫秒数
      */
-    setTimeToDate: function (date) {
+    setTimeByDate: function (date) {
       return this.setHour(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
     },
 
@@ -73,7 +73,7 @@
      * @returns {number} range{-1,0,1}
      */
     compareTo: function (date) {
-      if(Date.isDate(date)){
+      if (Date.isDate(date)) {
         return this < date ? -1 : this > date ? 1 : 0;
       }
       throw new TypeError(date + "is not a Date object");
@@ -85,6 +85,84 @@
      */
     clone: function () {
       return new Date(this.getTime());
+    },
+
+    /**
+     * 增加日期的毫秒数
+     * @param {Number} number [Required]
+     * @return {Date} this
+     */
+    addMilliseconds: function (number) {
+      this.setMilliseconds(this.getMilliseconds() + number * 1);
+      return this;
+    },
+
+    /**
+     * 增加日期的秒数
+     * @param {Number} number [Required]
+     * @return {Date} this
+     */
+    addSeconds: function (number) {
+      return this.addMilliseconds(number * 1000);
+    },
+
+    /**
+     * 增加日期的分钟数
+     * @param {Number} number [Required]
+     * @return {Date} this
+     */
+    addMinutes: function (number) {
+      return this.addMilliseconds(number * 60 * 1000);
+    },
+
+    /**
+     * 增加日期的小时数
+     * @param {Number} number [Required]
+     * @return {Date} this
+     */
+    addHours: function (number) {
+      return this.addMilliseconds(number * 60 * 60 *1000);
+    },
+
+    /**
+     * 增加日期的天数
+     * @param {Number} number [Required]
+     * @return {Date} this
+     */
+    addDays: function (number) {
+      this.setDate(this.getDate() + number * 1);
+      return this;
+    },
+
+    /**
+     * 增加日期的周数
+     * @param {Number} number [Required]
+     * @return {Date} this
+     */
+    addWeeks: function (number) {
+      return this.addDays(number * 7);
+    },
+
+    /**
+     * 增加日期的月份
+     * @param {Number} number [Required]
+     * @return {Date} this
+     */
+    addMonths: function (number) {
+      var n = this.getDate();
+      this.setDate(1);
+      this.setMonth(this.getMonth() + number * 1);
+      this.setDate(Math.min(n, this.getMonthDays()));
+      return this;
+    },
+
+    /**
+     * 增加日期的年份
+     * @param {Number} number [Required]
+     * @return {Date} this
+     */
+    addYears: function (number) {
+      return this.addMonths(number * 12);
     },
 
     /**
@@ -284,6 +362,11 @@
       }
     },
 
+    /**
+     * 获取当个时间跨度量词段的剩余天数
+     * @param {string} classifier
+     * @returns {number}
+     */
     getRestDaysByClassifier: function (classifier) {
       switch (classifier) {
         case "day":
@@ -302,7 +385,6 @@
           return 0;
       }
     },
-
 
     /**
      * 获取当个时间跨度量词段的天数
