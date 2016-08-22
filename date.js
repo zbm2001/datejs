@@ -32,43 +32,43 @@
     rDigitsG = /\d+/g,
     rPeriod = /^(last|past|next)([0-9]*)([dD]ays|[wW]eeks|[mM]onths|[qQ]uarters|[yY]ears|[cC]enturies)$/,
 
-  // æ¯æœˆå¤©æ•°ï¼ˆå¹³å¹´ï¼‰
+  // Ã¿ÔÂÌìÊı£¨Æ½Äê£©
     perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-  // æ¯å­£åº¦å¤©æ•°ï¼ˆå¹³å¹´ï¼‰
+  // Ã¿¼¾¶ÈÌìÊı£¨Æ½Äê£©
     perQuarterDays = [90, 91, 92, 92],
 
     toString = Object.prototype.toString;
 
-  // æ‰©å±•æ—¥æœŸç±»çš„åŸå‹æ–¹æ³•
+  // À©Õ¹ÈÕÆÚÀàµÄÔ­ĞÍ·½·¨
   Object.assign(Date.prototype, {
 
     /**
-     * è®¾ç½®æ—¥æœŸå¯¹è±¡çš„æ—¶é—´ä¸º 00:00:00 000
-     * @returns {number} å½“å‰æ—¥æœŸå¯¹è±¡çš„æ¯«ç§’æ•°
+     * ÉèÖÃÈÕÆÚ¶ÔÏóµÄÊ±¼äÎª 00:00:00 000
+     * @returns {number} µ±Ç°ÈÕÆÚ¶ÔÏóµÄºÁÃëÊı
      */
     setTimeToFirst: function () {
       return this.setHour(0, 0, 0, 0);
     },
 
     /**
-     * è®¾ç½®æ—¥æœŸå¯¹è±¡çš„æ—¶é—´ä¸º 23:59:59 999
-     * @returns {number} å½“å‰æ—¥æœŸå¯¹è±¡çš„æ¯«ç§’æ•°
+     * ÉèÖÃÈÕÆÚ¶ÔÏóµÄÊ±¼äÎª 23:59:59 999
+     * @returns {number} µ±Ç°ÈÕÆÚ¶ÔÏóµÄºÁÃëÊı
      */
     setTimeToLast: function () {
       return this.setHour(23, 59, 59, 999);
     },
 
     /**
-     * è®¾ç½®æ—¶é—´ä¸ç›®æ ‡æ—¥æœŸå¯¹è±¡çš„æ—¶é—´ä¸€è‡´ hh:mm:ss SSS
+     * ÉèÖÃÊ±¼äÓëÄ¿±êÈÕÆÚ¶ÔÏóµÄÊ±¼äÒ»ÖÂ hh:mm:ss SSS
      * @param {Date} date
-     * @returns {number} å½“å‰æ—¥æœŸå¯¹è±¡çš„æ¯«ç§’æ•°
+     * @returns {number} µ±Ç°ÈÕÆÚ¶ÔÏóµÄºÁÃëÊı
      */
     setTimeByDate: function (date) {
       return this.setHour(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
     },
 
     /**
-     * ä¸å¦ä¸€ä¸ªæ—¥æœŸå¯¹è±¡æ¯”è¾ƒæ¯«ç§’æ•°å¤§å°
+     * ÓëÁíÒ»¸öÈÕÆÚ¶ÔÏó±È½ÏºÁÃëÊı´óĞ¡
      * @param {Date} date
      * @returns {number} range{-1,0,1}
      */
@@ -80,7 +80,7 @@
     },
 
     /**
-     * å¤åˆ¶ä¸€ä¸ªæ—¥æœŸå¯¹è±¡
+     * ¸´ÖÆÒ»¸öÈÕÆÚ¶ÔÏó
      * @returns {Date}
      */
     clone: function () {
@@ -88,7 +88,7 @@
     },
 
     /**
-     * å¢åŠ æ—¥æœŸçš„æ¯«ç§’æ•°
+     * Ôö¼ÓÈÕÆÚµÄºÁÃëÊı
      * @param {Number} number [Required]
      * @return {Date} this
      */
@@ -98,7 +98,7 @@
     },
 
     /**
-     * å¢åŠ æ—¥æœŸçš„ç§’æ•°
+     * Ôö¼ÓÈÕÆÚµÄÃëÊı
      * @param {Number} number [Required]
      * @return {Date} this
      */
@@ -107,7 +107,7 @@
     },
 
     /**
-     * å¢åŠ æ—¥æœŸçš„åˆ†é’Ÿæ•°
+     * Ôö¼ÓÈÕÆÚµÄ·ÖÖÓÊı
      * @param {Number} number [Required]
      * @return {Date} this
      */
@@ -116,7 +116,7 @@
     },
 
     /**
-     * å¢åŠ æ—¥æœŸçš„å°æ—¶æ•°
+     * Ôö¼ÓÈÕÆÚµÄĞ¡Ê±Êı
      * @param {Number} number [Required]
      * @return {Date} this
      */
@@ -125,7 +125,7 @@
     },
 
     /**
-     * å¢åŠ æ—¥æœŸçš„å¤©æ•°
+     * Ôö¼ÓÈÕÆÚµÄÌìÊı
      * @param {Number} number [Required]
      * @return {Date} this
      */
@@ -135,7 +135,7 @@
     },
 
     /**
-     * å¢åŠ æ—¥æœŸçš„å‘¨æ•°
+     * Ôö¼ÓÈÕÆÚµÄÖÜÊı
      * @param {Number} number [Required]
      * @return {Date} this
      */
@@ -144,7 +144,7 @@
     },
 
     /**
-     * å¢åŠ æ—¥æœŸçš„æœˆä»½
+     * Ôö¼ÓÈÕÆÚµÄÔÂ·İ
      * @param {Number} number [Required]
      * @return {Date} this
      */
@@ -157,7 +157,7 @@
     },
 
     /**
-     * å¢åŠ æ—¥æœŸçš„å¹´ä»½
+     * Ôö¼ÓÈÕÆÚµÄÄê·İ
      * @param {Number} number [Required]
      * @return {Date} this
      */
@@ -166,7 +166,7 @@
     },
 
     /**
-     * è·å–å½“æœˆä»½è‡ªç„¶æ•°
+     * »ñÈ¡µ±ÔÂ·İ×ÔÈ»Êı
      * @returns {number} range{1,12}
      */
     getNaturalMonth: function () {
@@ -174,9 +174,9 @@
     },
 
     /**
-     * è®¾ç½®å½“å‰æ—¥æœŸå¯¹è±¡çš„æœˆä»½
-     * @param {number} month æœˆä»½
-     * @returns {number} å½“å‰æ—¥æœŸå¯¹è±¡çš„æ¯«ç§’æ•°
+     * ÉèÖÃµ±Ç°ÈÕÆÚ¶ÔÏóµÄÔÂ·İ
+     * @param {number} month ÔÂ·İ
+     * @returns {number} µ±Ç°ÈÕÆÚ¶ÔÏóµÄºÁÃëÊı
      */
     setNaturalMonth: function (month) {
       month = Number(month);
@@ -191,7 +191,7 @@
     },
 
     /**
-     * è·å–å½“å¹´æ¯æœˆå¤©æ•°çš„æ•°ç»„
+     * »ñÈ¡µ±ÄêÃ¿ÔÂÌìÊıµÄÊı×é
      * @returns {Array.<number>} length{12} range{28,31}
      */
     getDaysPerMonth: function () {
@@ -202,7 +202,7 @@
     },
 
     /**
-     * è·å–å½“å¹´æ¯å­£åº¦å¤©æ•°çš„æ•°ç»„
+     * »ñÈ¡µ±ÄêÃ¿¼¾¶ÈÌìÊıµÄÊı×é
      * @returns {Array.<number>} length{4} range{91,92}
      */
     getDaysPerQuarter: function () {
@@ -213,7 +213,7 @@
     },
 
     /**
-     * è·å–å½“å¹´å½“æœˆçš„å¤©æ•°
+     * »ñÈ¡µ±Äêµ±ÔÂµÄÌìÊı
      * @returns {number} range{28,31}
      */
     getMonthDays: function () {
@@ -226,7 +226,7 @@
     },
 
     /**
-     * è·å–å½“å¹´å½“å­£åº¦çš„å¤©æ•°
+     * »ñÈ¡µ±Äêµ±¼¾¶ÈµÄÌìÊı
      * @returns {number} range{91,92}
      */
     getQuarterDays: function () {
@@ -239,7 +239,7 @@
     },
 
     /**
-     * è·å–å½“å¹´çš„å¤©æ•°
+     * »ñÈ¡µ±ÄêµÄÌìÊı
      * @returns {number} range{365,366}
      */
     getYearDays: function () {
@@ -248,7 +248,7 @@
     },
 
     /**
-     * è·å–å½“ä¸–çºªçš„å¤©æ•°
+     * »ñÈ¡µ±ÊÀ¼ÍµÄÌìÊı
      * @returns {number} range{36523,36524}
      */
     getCenturyDays: function () {
@@ -257,14 +257,14 @@
         startYear = parseInt(year / 100) * 100;
 
       days += 100 * 365 + parseInt(99 / 4);
-      // è‹¥æœ¬ä¸–çºªå…ƒå¹´ä¸ºé—°å¹´ï¼Œå†åŠ ä¸€å¤©
+      // Èô±¾ÊÀ¼ÍÔªÄêÎªÈòÄê£¬ÔÙ¼ÓÒ»Ìì
       !(startYear % 400) && days++;
 
       return days;
     },
 
     /**
-     * è·å–å½“å­£åº¦æ•°
+     * »ñÈ¡µ±¼¾¶ÈÊı
      * @returns {number} range{1,4}
      */
     getQuarter: function () {
@@ -272,7 +272,7 @@
     },
 
     /**
-     * è·å–å½“ä¸–çºªæ•°
+     * »ñÈ¡µ±ÊÀ¼ÍÊı
      * @returns {Number}
      */
     getCentury: function () {
@@ -281,7 +281,7 @@
     },
 
     /**
-     * è·å–å½“å­£åº¦çš„ç¬¬å¤šå°‘å¤©
+     * »ñÈ¡µ±¼¾¶ÈµÄµÚ¶àÉÙÌì
      * @returns {number} range{1,92}
      */
     getQuarterDate: function () {
@@ -293,7 +293,7 @@
     },
 
     /**
-     * è·å–å½“å¹´çš„ç¬¬å¤šå°‘å¤©
+     * »ñÈ¡µ±ÄêµÄµÚ¶àÉÙÌì
      * @returns {number} range{1,366}
      */
     getYearDate: function () {
@@ -305,7 +305,7 @@
     },
 
     /**
-     * è·å–å½“ä¸ªä¸–çºªçš„ç¬¬å¤šå°‘å¤©
+     * »ñÈ¡µ±¸öÊÀ¼ÍµÄµÚ¶àÉÙÌì
      * @returns {number} range{1,36524}
      */
     getCenturyDate: function () {
@@ -314,14 +314,14 @@
         startYear = parseInt(year / 100) * 100;
 
       date += (year - startYear - 1) * 365 + parseInt((year - startYear) / 4);
-      // è‹¥æœ¬ä¸–çºªå…ƒå¹´ä¸ºé—°å¹´ï¼Œå†åŠ ä¸€å¤©
+      // Èô±¾ÊÀ¼ÍÔªÄêÎªÈòÄê£¬ÔÙ¼ÓÒ»Ìì
       !(startYear % 400) && date++;
 
       return date;
     },
 
     /**
-     * åˆ¤æ–­å½“å¹´æ˜¯å¦ä¸ºé—°å¹´
+     * ÅĞ¶Ïµ±ÄêÊÇ·ñÎªÈòÄê
      * @returns {boolean}
      */
     isLeapYear: function () {
@@ -330,7 +330,7 @@
     },
 
     /**
-     * åˆ¤æ–­å½“å¹´æ˜¯å¦ä¸ºå¹³å¹´
+     * ÅĞ¶Ïµ±ÄêÊÇ·ñÎªÆ½Äê
      * @returns {boolean}
      */
     isAverageYear: function () {
@@ -339,7 +339,7 @@
     },
 
     /**
-     * è·å–å½“ä¸ªæ—¶é—´è·¨åº¦é‡è¯æ®µçš„ç¬¬å¤šå°‘å¤©
+     * »ñÈ¡µ±¸öÊ±¼ä¿ç¶ÈÁ¿´Ê¶ÎµÄµÚ¶àÉÙÌì
      * @param {string} classifier
      * @returns {number} range{1,36524}
      */
@@ -363,7 +363,7 @@
     },
 
     /**
-     * è·å–å½“ä¸ªæ—¶é—´è·¨åº¦é‡è¯æ®µçš„å‰©ä½™å¤©æ•°
+     * »ñÈ¡µ±¸öÊ±¼ä¿ç¶ÈÁ¿´Ê¶ÎµÄÊ£ÓàÌìÊı
      * @param {string} classifier
      * @returns {number}
      */
@@ -387,7 +387,7 @@
     },
 
     /**
-     * è·å–å½“ä¸ªæ—¶é—´è·¨åº¦é‡è¯æ®µçš„å¤©æ•°
+     * »ñÈ¡µ±¸öÊ±¼ä¿ç¶ÈÁ¿´Ê¶ÎµÄÌìÊı
      * @param {string} classifier
      * @returns {number} range{1, 36524}
      */
@@ -411,7 +411,7 @@
     },
 
     /**
-     * è·å–è¿‡å»å¤šä¸ªæ—¶é—´è·¨åº¦é‡è¯æ®µçš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„è·¨åº¦é‡è¯æ®µ
+     * »ñÈ¡¹ıÈ¥¶à¸öÊ±¼ä¿ç¶ÈÁ¿´Ê¶ÎµÄÌìÊı£¬²»°üº¬µ±Ç°µÄ¿ç¶ÈÁ¿´Ê¶Î
      * @param {string} classifier
      * @param {number} number
      * @returns {number}
@@ -436,7 +436,7 @@
     },
 
     /**
-     * è·å–è¿‡å»æœˆæ•°çš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„æœˆä»½
+     * »ñÈ¡¹ıÈ¥ÔÂÊıµÄÌìÊı£¬²»°üº¬µ±Ç°µÄÔÂ·İ
      * @param {number} number
      * @returns {number}
      */
@@ -455,7 +455,7 @@
     },
 
     /**
-     * è·å–è¿‡å»å­£åº¦æ•°çš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„å­£åº¦
+     * »ñÈ¡¹ıÈ¥¼¾¶ÈÊıµÄÌìÊı£¬²»°üº¬µ±Ç°µÄ¼¾¶È
      * @param {number} number
      * @returns {number}
      */
@@ -474,7 +474,7 @@
     },
 
     /**
-     * è·å–è¿‡å»å¹´æ•°çš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„å¹´ä»½
+     * »ñÈ¡¹ıÈ¥ÄêÊıµÄÌìÊı£¬²»°üº¬µ±Ç°µÄÄê·İ
      * @param {number} number
      * @returns {number}
      */
@@ -487,7 +487,7 @@
     },
 
     /**
-     * è·å–è¿‡å»ä¸–çºªæ•°çš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„ä¸–çºª
+     * »ñÈ¡¹ıÈ¥ÊÀ¼ÍÊıµÄÌìÊı£¬²»°üº¬µ±Ç°µÄÊÀ¼Í
      * @param {number} number
      * @returns {number}
      */
@@ -500,7 +500,7 @@
     },
 
     /**
-     * è·å–è¿‡å»å¤šä¸ªæ—¶é—´è·¨åº¦é‡è¯æ®µçš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„è·¨åº¦é‡è¯æ®µ
+     * »ñÈ¡¹ıÈ¥¶à¸öÊ±¼ä¿ç¶ÈÁ¿´Ê¶ÎµÄÌìÊı£¬²»°üº¬µ±Ç°µÄ¿ç¶ÈÁ¿´Ê¶Î
      * @param {string} classifier
      * @param {number} number
      * @returns {number}
@@ -525,7 +525,7 @@
     },
 
     /**
-     * è·å–å°†æ¥æœˆæ•°çš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„æœˆä»½
+     * »ñÈ¡½«À´ÔÂÊıµÄÌìÊı£¬²»°üº¬µ±Ç°µÄÔÂ·İ
      * @param {number} number
      * @returns {number}
      */
@@ -544,7 +544,7 @@
     },
 
     /**
-     * è·å–å°†æ¥å­£åº¦æ•°çš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„å­£åº¦
+     * »ñÈ¡½«À´¼¾¶ÈÊıµÄÌìÊı£¬²»°üº¬µ±Ç°µÄ¼¾¶È
      * @param {number} number
      * @returns {number}
      */
@@ -563,7 +563,7 @@
     },
 
     /**
-     * è·å–å°†æ¥å¹´æ•°çš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„å¹´ä»½
+     * »ñÈ¡½«À´ÄêÊıµÄÌìÊı£¬²»°üº¬µ±Ç°µÄÄê·İ
      * @param {number} number
      * @returns {number}
      */
@@ -576,7 +576,7 @@
     },
 
     /**
-     * è·å–å°†æ¥ä¸–çºªæ•°çš„å¤©æ•°ï¼Œä¸åŒ…å«å½“å‰çš„ä¸–çºª
+     * »ñÈ¡½«À´ÊÀ¼ÍÊıµÄÌìÊı£¬²»°üº¬µ±Ç°µÄÊÀ¼Í
      * @param {number} number
      * @returns {number}
      */
@@ -588,23 +588,23 @@
       return days;
     },
 
-    // è·å–å½“å¹´ç¬¬å¤šå°‘å‘¨
+    // »ñÈ¡µ±ÄêµÚ¶àÉÙÖÜ
     getYearWeek: function () {
 
     },
 
-    // è·å–å½“å­£ç¬¬å¤šå°‘å‘¨
+    // »ñÈ¡µ±¼¾µÚ¶àÉÙÖÜ
     getQuarterWeek: function () {
 
     },
 
-    // è·å–å½“æœˆç¬¬å¤šå°‘å‘¨
+    // »ñÈ¡µ±ÔÂµÚ¶àÉÙÖÜ
     getMonthWeek: function () {
 
     },
 
     /**
-     * è¿”å›æ ¼å¼åŒ–åçš„æ—¥æœŸæ ¼å¼
+     * ·µ»Ø¸ñÊ½»¯ºóµÄÈÕÆÚ¸ñÊ½
      * @param {string} format
      * @returns {string}
      */
@@ -648,11 +648,11 @@
 
   });
 
-  // æ‰©å±•é™æ€æ–¹æ³•
+  // À©Õ¹¾²Ì¬·½·¨
   Object.assign(Date, {
 
     /**
-     * åˆ¤æ–­æ˜¯å¦ä¸ºæ—¥æœŸå¯¹è±¡
+     * ÅĞ¶ÏÊÇ·ñÎªÈÕÆÚ¶ÔÏó
      * @param {Date} date
      * @returns {boolean}
      */
@@ -661,8 +661,8 @@
     },
 
     /**
-     * è·å–æŸå¹´æ¯æœˆå¤©æ•°çš„æ•°ç»„
-     * @param {number} year å¹´ä»½
+     * »ñÈ¡Ä³ÄêÃ¿ÔÂÌìÊıµÄÊı×é
+     * @param {number} year Äê·İ
      * @returns {Array.<number>}
      */
     getDaysPerMonth: function (year) {
@@ -672,9 +672,9 @@
     },
 
     /**
-     * è·å–æŸå¹´æŸæœˆä»½çš„å¤©æ•°
-     * @param {number} month æœˆä»½
-     * @param {number} year å¹´ä»½
+     * »ñÈ¡Ä³ÄêÄ³ÔÂ·İµÄÌìÊı
+     * @param {number} month ÔÂ·İ
+     * @param {number} year Äê·İ
      * @returns {number} range{28, 31}
      */
     getMonthDays: function (month, year) {
@@ -682,9 +682,9 @@
     },
 
     /**
-     * è·å–æŸå¹´æŸå­£åº¦çš„å¤©æ•°
-     * @param {number} quarter å­£åº¦
-     * @param {number} year å¹´ä»½
+     * »ñÈ¡Ä³ÄêÄ³¼¾¶ÈµÄÌìÊı
+     * @param {number} quarter ¼¾¶È
+     * @param {number} year Äê·İ
      * @returns {number} range{90, 92}
      */
     getQuarterDays: function (quarter, year) {
@@ -692,8 +692,8 @@
     },
 
     /**
-     * è·å–æŸå¹´ä»½çš„å¤©æ•°
-     * @param {number} year å¹´ä»½
+     * »ñÈ¡Ä³Äê·İµÄÌìÊı
+     * @param {number} year Äê·İ
      * @returns {number} range{365,366}
      */
     getYearDays: function (year) {
@@ -701,8 +701,8 @@
     },
 
     /**
-     * è·å–æŸä¸–çºªçš„å¤©æ•°
-     * @param {number} century ä¸–çºª
+     * »ñÈ¡Ä³ÊÀ¼ÍµÄÌìÊı
+     * @param {number} century ÊÀ¼Í
      * @returns {number} range{36523,36524}
      */
     getCenturyDays: function (century) {
@@ -710,15 +710,15 @@
         startYear = (Math.abs(century) - 1) * 100;
 
       days += (100) * 365 + parseInt(99 / 4);
-      // è‹¥æœ¬ä¸–çºªå…ƒå¹´ä¸ºé—°å¹´ï¼Œå†åŠ ä¸€å¤©
+      // Èô±¾ÊÀ¼ÍÔªÄêÎªÈòÄê£¬ÔÙ¼ÓÒ»Ìì
       !(startYear % 400) && days++;
 
       return days;
     },
 
     /**
-     * è·å–æŸå¹´ä»½æ‰€å±ä¸–çºªçš„å¤©æ•°
-     * @param {number} year å¹´ä»½
+     * »ñÈ¡Ä³Äê·İËùÊôÊÀ¼ÍµÄÌìÊı
+     * @param {number} year Äê·İ
      * @returns {number} range{36523,36524}
      */
     getCenturyDaysByYear: function (year) {
@@ -727,7 +727,7 @@
     },
 
     /**
-     * è·å–æŸå¹´ä»½æ‰€å±çš„ä¸–çºªæ•°
+     * »ñÈ¡Ä³Äê·İËùÊôµÄÊÀ¼ÍÊı
      * @param {number} year
      * @returns {number}
      */
@@ -736,8 +736,8 @@
     },
 
     /**
-     * åˆ¤æ–­å¹´ä»½æ˜¯å¦ä¸ºé—°å¹´
-     * @param {number} year å¹´ä»½
+     * ÅĞ¶ÏÄê·İÊÇ·ñÎªÈòÄê
+     * @param {number} year Äê·İ
      * @returns {boolean}
      */
     isLeapYear: function (year) {
@@ -745,8 +745,8 @@
     },
 
     /**
-     * åˆ¤æ–­å¹´ä»½æ˜¯å¦ä¸ºå¹³å¹´
-     * @param {number} year å¹´ä»½
+     * ÅĞ¶ÏÄê·İÊÇ·ñÎªÆ½Äê
+     * @param {number} year Äê·İ
      * @returns {boolean}
      */
     isAverageYear: function (year) {
@@ -754,7 +754,7 @@
     },
 
     /**
-     * è§£ææ ¼å¼åŒ–çš„æ—¥æœŸï¼Œè¿”å›ç›¸åº”çš„æ—¥æœŸå¯¹è±¡
+     * ½âÎö¸ñÊ½»¯µÄÈÕÆÚ£¬·µ»ØÏàÓ¦µÄÈÕÆÚ¶ÔÏó
      * @param {string} time '2012-3-13 11:11:11 111' | '2012-3-13T11:11:11.111Z' | '2012-3-13' | '3/13/2012' | ...
      * @param {string} format  'yyyy-MM-dd hh:mm:ss SSS' | 'yyyy-MM-ddThh:mm:ss.SSSZ' |  'yyyy-MM-dd' | 'MM/dd/yyyy' | ...
      * @returns {Date}
@@ -790,7 +790,7 @@
     },
 
     /**
-     * è§£ææ—¶æ®µç”¨è¯­ï¼Œè¿”å›èµ·å§‹å’Œç»“æŸä¸¤ä¸ªæ—¶é—´æ ¼å¼å­—ç¬¦ä¸²çš„æ•°ç»„
+     * ½âÎöÊ±¶ÎÓÃÓï£¬·µ»ØÆğÊ¼ºÍ½áÊøÁ½¸öÊ±¼ä¸ñÊ½×Ö·û´®µÄÊı×é
      * @param {string} period
      * @param {string} format
      * @returns {Array.<string>}
@@ -805,7 +805,7 @@
     },
 
     /**
-     * è§£ææ—¶æ®µç”¨è¯­ï¼Œè¿”å›èµ·å§‹å’Œç»“æŸä¸¤ä¸ªæ—¥æœŸå¯¹è±¡çš„æ•°ç»„
+     * ½âÎöÊ±¶ÎÓÃÓï£¬·µ»ØÆğÊ¼ºÍ½áÊøÁ½¸öÈÕÆÚ¶ÔÏóµÄÊı×é
      * @param {string} period
      * @returns {Array.<Date>}
      */
@@ -819,8 +819,8 @@
 
     UTC_FORMAT: 'yyyy-MM-ddThh:mm:ss.SSSZ',
 
-    // Hashè¡¨ï¼šæ—¶é—´é‡è¯å¤æ•°è¯å¯¹åº”åŸè¯
-    // æ¯«ç§’ã€ç§’ã€åˆ†é’Ÿã€å°æ—¶ã€å¤©ã€å‘¨ã€æœˆã€å­£åº¦ã€å¹´ã€ä¸–çºª
+    // Hash±í£ºÊ±¼äÁ¿´Ê¸´Êı´Ê¶ÔÓ¦Ô­´Ê
+    // ºÁÃë¡¢Ãë¡¢·ÖÖÓ¡¢Ğ¡Ê±¡¢Ìì¡¢ÖÜ¡¢ÔÂ¡¢¼¾¶È¡¢Äê¡¢ÊÀ¼Í
     pluralClassifiers: {
       millisecond: "millisecond",
       seconds: "second",
@@ -834,13 +834,13 @@
       centuries: "century"
     },
 
-    // åŒ¹é…æ—¶æ®µè¯­å¥çš„æ­£åˆ™è¡¨è¾¾å¼
+    // Æ¥ÅäÊ±¶ÎÓï¾äµÄÕıÔò±í´ïÊ½
     rPeriod: rPeriod
 
   });
 
   /**
-   * è§£ææ—¶æ®µç”¨è¯­ï¼Œè¿”å›èµ·å§‹å’Œç»“æŸä¸¤ä¸ªæ—¥æœŸå¯¹è±¡çš„æ•°ç»„
+   * ½âÎöÊ±¶ÎÓÃÓï£¬·µ»ØÆğÊ¼ºÍ½áÊøÁ½¸öÈÕÆÚ¶ÔÏóµÄÊı×é
    * @param {string} period
    * @returns {Array.<Date>} length{2}
    */
@@ -858,48 +858,48 @@
       thisClassifierDays,
       number;
 
-    // è®¾ç½®å¼€å§‹æ—¶é—´ä¸ºé‚£å¤©çš„ 0 æ—¶è®¡èµ·
+    // ÉèÖÃ¿ªÊ¼Ê±¼äÎªÄÇÌìµÄ 0 Ê±¼ÆÆğ
     start0.setTimeToFirst();
     start = start0;
-    // è®¾ç½®ç»“æŸæ—¶é—´ä¸ºé‚£å¤©çš„æœ€åä¸€æ¯«ç§’æˆªæ­¢
+    // ÉèÖÃ½áÊøÊ±¼äÎªÄÇÌìµÄ×îºóÒ»ºÁÃë½ØÖ¹
     end2.setTimeToLast();
     end = end2;
 
     switch (period) {
-      case 'today': // ä»Šå¤©
+      case 'today': // ½ñÌì
         diffStartDays = 0;
         break;
-      case 'yesterday': // æ˜¨å¤©
+      case 'yesterday': // ×òÌì
         diffStartDays = -1;
         diffEndDays = -1;
         break;
-      case 'thisWeek':  // æœ¬å‘¨
+      case 'thisWeek':  // ±¾ÖÜ
         diffStartDays = 1 - start.getDay();
         break;
-      case 'lastWeek': // ä¸Šå‘¨
+      case 'lastWeek': // ÉÏÖÜ
         diffEndDays = -end.getDay();
         diffStartDays = diffEndDays + 1 - 7;
         break;
-      case 'thisMonth':  // æœ¬æœˆ
+      case 'thisMonth':  // ±¾ÔÂ
         diffStartDays = 1 - start.getDate();
         break;
-      case 'lastMonth': // ä¸Šæœˆ
+      case 'lastMonth': // ÉÏÔÂ
         diffEndDays = -end.getDate();
         now.setDate(0);
         diffStartDays = diffEndDays + 1 - now.getMonthDays();
         break;
-      case 'thisQuarter': // æœ¬å­£åº¦
+      case 'thisQuarter': // ±¾¼¾¶È
         diffStartDays = 1 - start.getQuarterDate();
         break;
-      case 'lastQuarter': // ä¸Šå­£åº¦
+      case 'lastQuarter': // ÉÏ¼¾¶È
         diffEndDays = -end.getQuarterDate();
         now.setDate(diffEndDays + now.getDate());
         diffStartDays = diffEndDays + 1 - now.getQuarterDays();
         break;
-      case 'thisYear': // æœ¬å¹´
+      case 'thisYear': // ±¾Äê
         diffStartDays = 1 - start.getYearDate();
         break;
-      case 'lastYear':  // ä¸Šå¹´
+      case 'lastYear':  // ÉÏÄê
         diffEndDays = -end.getYearDate();
         now.setFullYear(now.getFullYear() - 1);
         diffStartDays = diffEndDays + 1 - now.getYearDays();
@@ -913,16 +913,16 @@
           if (classifier = Date.pluralClassifiers[classifierPlural]) {
 
             switch (RegExp.$1) {
-              // last è¡¨ç¤ºæœ€è¿‘çš„å¤©ã€å‘¨ã€æœˆã€å­£åº¦ã€å¹´ã€ä¸–çºªæ•°ï¼Œåˆ†åˆ«å¯¹åº”åŒ…å«ä»Šå¤©ã€æœ¬å‘¨ã€æœ¬æœˆã€æœ¬å­£åº¦ã€æœ¬å¹´ã€æœ¬ä¸–çºª
+              // last ±íÊ¾×î½üµÄÌì¡¢ÖÜ¡¢ÔÂ¡¢¼¾¶È¡¢Äê¡¢ÊÀ¼ÍÊı£¬·Ö±ğ¶ÔÓ¦°üº¬½ñÌì¡¢±¾ÖÜ¡¢±¾ÔÂ¡¢±¾¼¾¶È¡¢±¾Äê¡¢±¾ÊÀ¼Í
               case 'last':
                 diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
-              // past è¡¨ç¤ºè¿‡å»çš„å¤©ã€å‘¨ã€æœˆã€å­£åº¦ã€å¹´ã€ä¸–çºªæ•°ï¼Œåˆ†åˆ«å¯¹åº”ä¸åŒ…å«ä»Šå¤©ã€æœ¬å‘¨ã€æœ¬æœˆã€æœ¬å­£åº¦ã€æœ¬å¹´ã€æœ¬ä¸–çºª
+              // past ±íÊ¾¹ıÈ¥µÄÌì¡¢ÖÜ¡¢ÔÂ¡¢¼¾¶È¡¢Äê¡¢ÊÀ¼ÍÊı£¬·Ö±ğ¶ÔÓ¦²»°üº¬½ñÌì¡¢±¾ÖÜ¡¢±¾ÔÂ¡¢±¾¼¾¶È¡¢±¾Äê¡¢±¾ÊÀ¼Í
               case 'past':
                 thisClassifierDays = now.getDateByClassifier(classifier);
                 diffStartDays -= thisClassifierDays;
                 diffEndDays -= thisClassifierDays;
                 break;
-              // past è¡¨ç¤ºå°†æ¥çš„å¤©ã€å‘¨ã€æœˆã€å­£åº¦ã€å¹´ã€ä¸–çºªæ•°ï¼Œåˆ†åˆ«å¯¹åº”ä¸åŒ…å«ä»Šå¤©ã€æœ¬å‘¨ã€æœ¬æœˆã€æœ¬å­£åº¦ã€æœ¬å¹´ã€æœ¬ä¸–çºª
+              // past ±íÊ¾½«À´µÄÌì¡¢ÖÜ¡¢ÔÂ¡¢¼¾¶È¡¢Äê¡¢ÊÀ¼ÍÊı£¬·Ö±ğ¶ÔÓ¦²»°üº¬½ñÌì¡¢±¾ÖÜ¡¢±¾ÔÂ¡¢±¾¼¾¶È¡¢±¾Äê¡¢±¾ÊÀ¼Í
               case 'next':
                 diffEndDays = now.getDaysByNextClassifiers(classifier, number);
                 thisClassifierDays = now.getRestDaysByClassifier(classifier);
