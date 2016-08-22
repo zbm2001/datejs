@@ -822,7 +822,7 @@
     // Hash表：时间量词复数词对应原词
     // 毫秒、秒、分钟、小时、天、周、月、季度、年、世纪
     pluralClassifiers: {
-      millisecond: "millisecond",
+      milliseconds: "millisecond",
       seconds: "second",
       minutes: "minute",
       hours: "hour",
