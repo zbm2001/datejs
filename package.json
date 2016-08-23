@@ -32,6 +32,8 @@
     "gulp-uglify": "^2.0.0"
   },
   "dependencies": {
+    "rollup-plugin-babel": "^2.6.1",
+    "rollup-plugin-uglify": "^1.0.1",
     "supports-color": "^3.1.2"
   }
 }

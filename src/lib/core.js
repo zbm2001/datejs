@@ -1,16 +1,5 @@
-/**
- * @language: Javascript ECMA5
- * @name: datejs
- * @description: Javascript Date Object extend
- * @version: 1.0.0
- * @author: zbm2001@aliyun.com
- * @date: 2016-08-15
- * @copyright: Copyright (c) 2008-2016, Zhou Bai Min. (https://github.com/zbm2001). All rights reserved.
- * @license: See LICENSE and https://github.com/zbm2001/datejs/blob/master/LICENSE
- * @website: https://github.com/zbm2001
- */
-
-(function () {
+import assign from './util/assign';
+import typeOf from './util/typeOf';
 
   var ry = /y+/,
     rM = /M+/,
@@ -35,12 +24,10 @@
   // 每月天数（平年）
     perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
   // 每季度天数（平年）
-    perQuarterDays = [90, 91, 92, 92],
-
-    toString = Object.prototype.toString;
+    perQuarterDays = [90, 91, 92, 92];
 
   // 扩展日期类的原型方法
-  Object.assign(Date.prototype, {
+  assign(Date.prototype, {
 
     /**
      * 设置日期对象的时间为 00:00:00 000
@@ -649,7 +636,7 @@
   });
 
   // 扩展静态方法
-  Object.assign(Date, {
+  assign(Date, {
 
     /**
      * 判断是否为日期对象
@@ -657,7 +644,7 @@
      * @returns {boolean}
      */
     isDate: function (date) {
-      return toString.call(date) === '[object Date]';
+      return typeOf(date) === 'Date';
     },
 
     /**
@@ -940,4 +927,4 @@
     return [start, end];
   }
 
-})();
+export default Date;
