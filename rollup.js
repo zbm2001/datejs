@@ -1,8 +1,13 @@
 // 项目下直接命令 node rollup.js
-import fs from 'fs';
-import rollup from 'rollup';
-import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
+// import fs from 'fs';
+// import rollup from 'rollup';
+// import babel from 'rollup-plugin-babel';
+// import uglify from 'rollup-plugin-uglify';
+
+const fs = require('fs');
+const rollup = require('rollup');
+const babel = require('rollup-plugin-babel');
+const uglify = require('rollup-plugin-uglify');
 
 rollup.rollup({
   entry: 'src/index.js',

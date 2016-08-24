@@ -608,7 +608,7 @@
      * @param {string} format
      * @returns {string}
      */
-    format: function (format) {
+    format2: function (format) {
 
       format || ( format = Date.FORMAT );
 

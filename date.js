@@ -1,5 +1,5 @@
 /**
- * @language: Javascript ECMA5
+ * @language: Javascript es5
  * @name: datejs
  * @description: Javascript Date Object extend
  * @version: 1.0.0
@@ -608,7 +608,7 @@
      * @param {string} format
      * @returns {string}
      */
-    format: function (format) {
+    format2: function (format) {
 
       format || ( format = Date.FORMAT );
 
