@@ -9,7 +9,7 @@
 this.writeForin = function(obj, name){
   var html = '<ul><li>' + 
   Object.keys(obj).map(function(key){
-    return 'date.' + key + 
+    return name + '.' + key + 
     ' (' + (typeof obj[key] == 'function' ? '方法' : '属性') + ')';
   }).join('</li><li>') + 
   '</li></ul>'
@@ -23,11 +23,11 @@ this.writeForin = function(obj, name){
 <body>
 <h2>Date原型方法和属性</h2>
 <script>
-writeForin(Date.prototype, 'data');
+writeForin(Date.prototype, 'date');
 </script>
 <h2>Date静态方法和属性</h2>
 <script>
-writeForin(Date, 'Data');
+writeForin(Date, 'Date');
 </script>
 </body>
 </html>

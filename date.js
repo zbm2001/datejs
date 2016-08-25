@@ -8,221 +8,41 @@
 (function () {
 'use strict';
 
-var i18n = {
-  /* Culture Name */
-  name: "zh-CN",
-  englishName: "Chinese (People's Republic of China)",
-  nativeName: "中文(中华人民共和国)",
+var toString = Object.prototype.toString;
 
-  /* Day Name Strings */
-  dayNames: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
-  abbreviatedDayNames: ["日", "一", "二", "三", "四", "五", "六"],
-  shortestDayNames: ["日", "一", "二", "三", "四", "五", "六"],
-  firstLetterDayNames: ["日", "一", "二", "三", "四", "五", "六"],
+function typeOf(object) {
+  return toString.call(object).slice(8, -1);
+}
 
-  /* Month Name Strings */
-  monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
-  abbreviatedMonthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+var sPop = Array.prototype.pop + '';
+var sNativeCode = sPop.slice(sPop.indexOf('{'));
 
-  /* AM/PM Designators */
-  amDesignator: "上午",
-  pmDesignator: "下午",
+function isNativeFunction(func) {
+  return typeOf(func) === 'Function' && sNativeCode === (func += '').slice(func.indexOf('{'));
+}
 
-  firstDayOfWeek: 0,
-  twoDigitYearMax: 2029,
+isNativeFunction(Object.assign) ? Object.assign :
+  (Object.assign = function assign(target) {
+    var arguments$1 = arguments;
 
-  /**
-   * The dateElementOrder is based on the order of the
-   * format specifiers in the formatPatterns.DatePattern.
-   *
-   * Example:
-   <pre>
-   shortDatePattern    dateElementOrder
-   ------------------  ----------------
-   "M/d/yyyy"          "mdy"
-   "dd/MM/yyyy"        "dmy"
-   "yyyy-MM-dd"        "ymd"
-   </pre>
-   *
-   * The correct dateElementOrder is required by the parser to
-   * determine the expected order of the date elements in the
-   * string being parsed.
-   */
-  dateElementOrder: "ymd",
+    if (target == null) {
+      throw new TypeError('Cannot convert undefined or null to object');
+    }
+    var output = Object(target), i = 1, l = arguments.length, prop, source;
+    for (; i < l; i++) {
+      source = arguments$1[i];
+      if (source != null) {
+        for (prop in source) {
+          if (source.hasOwnProperty(prop)) {
+            output[prop] = source[prop];
+          }
+        }
+      }
+    }
+    return output;
+  });
 
-  /* Standard date and time format patterns */
-  formatPatterns: {
-    shortDate: "yyyy/M/d",
-    longDate: "yyyy'年'M'月'd'日'",
-    shortTime: "H:mm",
-    longTime: "H:mm:ss",
-    fullDateTime: "yyyy'年'M'月'd'日' H:mm:ss",
-    sortableDateTime: "yyyy-MM-ddTHH:mm:ss",
-    universalSortableDateTime: "yyyy-MM-dd HH:mm:ssZ",
-    rfc1123: "ddd, dd MMM yyyy HH:mm:ss GMT",
-    monthDay: "M'月'd'日'",
-    yearMonth: "yyyy'年'M'月'"
-  },
-
-  /* date and time Names hash String */
-  unitNames: {
-    millisecond: "毫秒",
-    second: "秒",
-    minute: "分钟",
-    hour: "小时",
-    day: "天",
-    week: "周",
-    month: "月",
-    quarter: "季度",
-    year: "年",
-    century: "世纪"
-  },
-
-  /**
-   * NOTE: If a string format is not parsing correctly, but
-   * you would expect it parse, the problem likely lies below.
-   *
-   * The following regex patterns control most of the string matching
-   * within the parser.
-   *
-   * The Month name and Day name patterns were automatically generated
-   * and in general should be (mostly) correct.
-   *
-   * Beyond the month and day name patterns are natural language strings.
-   * Example: "next", "today", "months"
-   *
-   * These natural language string may NOT be correct for this culture.
-   * If they are not correct, please translate and edit this file
-   * providing the correct regular expression pattern.
-   *
-   * If you modify this file, please post your revised CultureInfo file
-   * to the Datejs Forum located at http://www.datejs.com/forums/.
-   *
-   * Please mark the subject of the post with [CultureInfo]. Example:
-   *    Subject: [CultureInfo] Translated "da-DK" Danish(Denmark)
-   *
-   * We will add the modified patterns to the master source files.
-   *
-   * As well, please review the list of "Future Strings" section below.
-   */
-  regexPatterns: {
-    jan: /^一月/i,
-    feb: /^二月/i,
-    mar: /^三月/i,
-    apr: /^四月/i,
-    may: /^五月/i,
-    jun: /^六月/i,
-    jul: /^七月/i,
-    aug: /^八月/i,
-    sep: /^九月/i,
-    oct: /^十月/i,
-    nov: /^十一月/i,
-    dec: /^十二月/i,
-
-    sun: /^星期日/i,
-    mon: /^星期一/i,
-    tue: /^星期二/i,
-    wed: /^星期三/i,
-    thu: /^星期四/i,
-    fri: /^星期五/i,
-    sat: /^星期六/i,
-
-    future: /^next/i,
-    past: /^last|past|prev(ious)?/i,
-    add: /^(\+|aft(er)?|from|hence)/i,
-    subtract: /^(\-|bef(ore)?|ago)/i,
-
-    yesterday: /^yes(terday)?/i,
-    today: /^t(od(ay)?)?/i,
-    tomorrow: /^tom(orrow)?/i,
-    now: /^n(ow)?/i,
-
-    millisecond: /^ms|milli(second)?s?/i,
-    second: /^sec(ond)?s?/i,
-    minute: /^mn|min(ute)?s?/i,
-    hour: /^h(our)?s?/i,
-    week: /^w(eek)?s?/i,
-    month: /^m(onth)?s?/i,
-    day: /^d(ay)?s?/i,
-    year: /^y(ear)?s?/i,
-
-    shortMeridian: /^(a|p)/i,
-    longMeridian: /^(a\.?m?\.?|p\.?m?\.?)/i,
-    timezone: /^((e(s|d)t|c(s|d)t|m(s|d)t|p(s|d)t)|((gmt)?\s*(\+|\-)\s*\d\d\d\d?)|gmt|utc)/i,
-    ordinalSuffix: /^\s*(st|nd|rd|th)/i,
-    timeContext: /^\s*(\:|a(?!u|p)|p)/i
-  },
-
-  timezones: [{name:"UTC", offset:"-000"}, {name:"GMT", offset:"-000"}, {name:"EST", offset:"-0500"}, {name:"EDT", offset:"-0400"}, {name:"CST", offset:"-0600"}, {name:"CDT", offset:"-0500"}, {name:"MST", offset:"-0700"}, {name:"MDT", offset:"-0600"}, {name:"PST", offset:"-0800"}, {name:"PDT", offset:"-0700"}]
-};
-
-/********************
- ** Future Strings **
- ********************
- *
- * The following list of strings may not be currently being used, but
- * may be incorporated into the Datejs library later.
- *
- * We would appreciate any help translating the strings below.
- *
- * If you modify this file, please post your revised CultureInfo file
- * to the Datejs Forum located at http://www.datejs.com/forums/.
- *
- * Please mark the subject of the post with [CultureInfo]. Example:
- *    Subject: [CultureInfo] Translated "da-DK" Danish(Denmark)b
- *
- * English Name        Translated
- * ------------------  -----------------
- * about               about
- * ago                 ago
- * date                date
- * time                time
- * calendar            calendar
- * show                show
- * hourly              hourly
- * daily               daily
- * weekly              weekly
- * bi-weekly           bi-weekly
- * fortnight           fortnight
- * monthly             monthly
- * bi-monthly          bi-monthly
- * quarter             quarter
- * quarterly           quarterly
- * yearly              yearly
- * annual              annual
- * annually            annually
- * annum               annum
- * again               again
- * between             between
- * after               after
- * from now            from now
- * repeat              repeat
- * times               times
- * per                 per
- * min (abbrev minute) min
- * morning             morning
- * noon                noon
- * night               night
- * midnight            midnight
- * mid-night           mid-night
- * evening             evening
- * final               final
- * future              future
- * spring              spring
- * summer              summer
- * fall                fall
- * winter              winter
- * end of              end of
- * end                 end
- * long                long
- * short               short
- */
-
-//import assign from './util/assign';
-//import typeOf from './util/typeOf';
-Date.i18n = i18n;
-
-  var ry = /y+/;
+var ry = /y+/;
 var rM = /M+/;
 var rd = /d+/;
 var rh = /h+/;
@@ -238,7 +58,7 @@ var rsG = /s+/g;
 var rSG = /S+/g;
 var rMdhmsG = /[Mdhms]+/g;
 var rDigitsG = /\d+/g;
-var rPeriod = /^(last|past|next)([0-9]*)([dD]ays|[wW]eeks|[mM]onths|[qQ]uarters|[yY]ears|[cC]enturies)$/;
+var rPeriod = /^(this|last|past|next)([0-9]*)(days?|weeks?|months?|quarters?|years?|centuries?)$/i;
 var perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 var perQuarterDays = [90, 91, 92, 92];
 // 扩展日期类的原型方法
@@ -249,7 +69,7 @@ var perQuarterDays = [90, 91, 92, 92];
      * @returns {number} 当前日期对象的毫秒数
      */
     setTimeToFirst: function () {
-      return this.setHour(0, 0, 0, 0);
+      return this.setHours(0, 0, 0, 0);
     },
 
     /**
@@ -257,7 +77,7 @@ var perQuarterDays = [90, 91, 92, 92];
      * @returns {number} 当前日期对象的毫秒数
      */
     setTimeToLast: function () {
-      return this.setHour(23, 59, 59, 999);
+      return this.setHours(23, 59, 59, 999);
     },
 
     /**
@@ -266,7 +86,7 @@ var perQuarterDays = [90, 91, 92, 92];
      * @returns {number} 当前日期对象的毫秒数
      */
     setTimeByDate: function (date) {
-      return this.setHour(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+      return this.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
     },
 
     /**
@@ -433,8 +253,8 @@ var perQuarterDays = [90, 91, 92, 92];
      */
     getQuarterDays: function () {
       var quarter = this.getQuarter(), year;
-      if (quarter !== 0) {
-        return perQuarterDays[quarter];
+      if (quarter !== 1) {
+        return perQuarterDays[quarter - 1];
       }
       year = this.getFullYear();
       return year % 4 || !(year % 400) ? 90 : 91;
@@ -488,7 +308,7 @@ var perQuarterDays = [90, 91, 92, 92];
      */
     getQuarterDate: function () {
       var month = this.getMonth(),
-        days = month || this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function (a, b) {
+        days = month && this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function (a, b) {
             return a + b;
           }, 0);
       return days + this.getDate();
@@ -500,7 +320,7 @@ var perQuarterDays = [90, 91, 92, 92];
      */
     getYearDate: function () {
       var month = this.getMonth(),
-        days = month || this.getDaysPerMonth().slice(0, month).reduce(function (a, b) {
+        days = month && this.getDaysPerMonth().slice(0, month).reduce(function (a, b) {
             return a + b;
           }, 0);
       return days + this.getDate();
@@ -810,7 +630,7 @@ var perQuarterDays = [90, 91, 92, 92];
      * @param {string} format
      * @returns {string}
      */
-    format2: function (format) {
+    format: function (format) {
 
       format || ( format = Date.FORMAT );
 
@@ -890,7 +710,7 @@ var perQuarterDays = [90, 91, 92, 92];
      * @returns {number} range{90, 92}
      */
     getQuarterDays: function (quarter, year) {
-      return quarter !== 0 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
+      return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
     },
 
     /**
@@ -1057,8 +877,7 @@ var perQuarterDays = [90, 91, 92, 92];
       diffEndDays = 0,
       classifier,
       classifierPlural,
-      thisClassifierDays,
-      number;
+      thisClassifierDays;
 
     // 设置开始时间为那天的 0 时计起
     start0.setTimeToFirst();
@@ -1117,29 +936,245 @@ var perQuarterDays = [90, 91, 92, 92];
             switch (RegExp.$1) {
               // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
               case 'last':
-                diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
+                diffStartDays = -now.getDaysByPastClassifiers(classifier, number) + 1;
+                break;
               // past 表示过去的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
               case 'past':
-                thisClassifierDays = now.getDateByClassifier(classifier);
-                diffStartDays -= thisClassifierDays;
+                diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
+                thisClassifierDays = now.getDateByClassifier(classifier, number);
+                diffStartDays -= thisClassifierDays - 1;
                 diffEndDays -= thisClassifierDays;
                 break;
               // past 表示将来的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
               case 'next':
                 diffEndDays = now.getDaysByNextClassifiers(classifier, number);
-                thisClassifierDays = now.getRestDaysByClassifier(classifier);
-                diffStartDays += thisClassifierDays;
+                thisClassifierDays = now.getRestDaysByClassifier(classifier, number);
+                diffStartDays += thisClassifierDays + 1;
                 diffEndDays += thisClassifierDays;
                 break;
               default:
             }
           }
         }
+        throw new Error('Unknown time period definition: ' + 'period');
     }
     start.setDate(start.getDate() + diffStartDays);
     end.setDate(end.getDate() + diffEndDays);
 
     return [start, end];
   }
+
+var i18n = {
+  /* Culture Name */
+  name: "zh-CN",
+  englishName: "Chinese (People's Republic of China)",
+  nativeName: "中文(中华人民共和国)",
+
+  /* Day Name Strings */
+  dayNames: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+  abbreviatedDayNames: ["日", "一", "二", "三", "四", "五", "六"],
+  shortestDayNames: ["日", "一", "二", "三", "四", "五", "六"],
+  firstLetterDayNames: ["日", "一", "二", "三", "四", "五", "六"],
+
+  /* Month Name Strings */
+  monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+  abbreviatedMonthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+
+  /* AM/PM Designators */
+  amDesignator: "上午",
+  pmDesignator: "下午",
+
+  firstDayOfWeek: 0,
+  twoDigitYearMax: 2029,
+
+  /**
+   * The dateElementOrder is based on the order of the
+   * format specifiers in the formatPatterns.DatePattern.
+   *
+   * Example:
+   <pre>
+   shortDatePattern    dateElementOrder
+   ------------------  ----------------
+   "M/d/yyyy"          "mdy"
+   "dd/MM/yyyy"        "dmy"
+   "yyyy-MM-dd"        "ymd"
+   </pre>
+   *
+   * The correct dateElementOrder is required by the parser to
+   * determine the expected order of the date elements in the
+   * string being parsed.
+   */
+  dateElementOrder: "ymd",
+
+  /* Standard date and time format patterns */
+  formatPatterns: {
+    shortDate: "yyyy/M/d",
+    longDate: "yyyy'年'M'月'd'日'",
+    shortTime: "H:mm",
+    longTime: "H:mm:ss",
+    fullDateTime: "yyyy'年'M'月'd'日' H:mm:ss",
+    sortableDateTime: "yyyy-MM-ddTHH:mm:ss",
+    universalSortableDateTime: "yyyy-MM-dd HH:mm:ssZ",
+    rfc1123: "ddd, dd MMM yyyy HH:mm:ss GMT",
+    monthDay: "M'月'd'日'",
+    yearMonth: "yyyy'年'M'月'"
+  },
+
+  /* date and time Names hash String */
+  unitNames: {
+    millisecond: "毫秒",
+    second: "秒",
+    minute: "分钟",
+    hour: "小时",
+    day: "天",
+    week: "周",
+    month: "月",
+    quarter: "季度",
+    year: "年",
+    century: "世纪"
+  },
+
+  /**
+   * NOTE: If a string format is not parsing correctly, but
+   * you would expect it parse, the problem likely lies below.
+   *
+   * The following regex patterns control most of the string matching
+   * within the parser.
+   *
+   * The Month name and Day name patterns were automatically generated
+   * and in general should be (mostly) correct.
+   *
+   * Beyond the month and day name patterns are natural language strings.
+   * Example: "next", "today", "months"
+   *
+   * These natural language string may NOT be correct for this culture.
+   * If they are not correct, please translate and edit this file
+   * providing the correct regular expression pattern.
+   *
+   * If you modify this file, please post your revised CultureInfo file
+   * to the Datejs Forum located at http://www.datejs.com/forums/.
+   *
+   * Please mark the subject of the post with [CultureInfo]. Example:
+   *    Subject: [CultureInfo] Translated "da-DK" Danish(Denmark)
+   *
+   * We will add the modified patterns to the master source files.
+   *
+   * As well, please review the list of "Future Strings" section below.
+   */
+  regexPatterns: {
+    jan: /^一月/i,
+    feb: /^二月/i,
+    mar: /^三月/i,
+    apr: /^四月/i,
+    may: /^五月/i,
+    jun: /^六月/i,
+    jul: /^七月/i,
+    aug: /^八月/i,
+    sep: /^九月/i,
+    oct: /^十月/i,
+    nov: /^十一月/i,
+    dec: /^十二月/i,
+
+    sun: /^星期日/i,
+    mon: /^星期一/i,
+    tue: /^星期二/i,
+    wed: /^星期三/i,
+    thu: /^星期四/i,
+    fri: /^星期五/i,
+    sat: /^星期六/i,
+
+    future: /^next/i,
+    past: /^last|past|prev(ious)?/i,
+    add: /^(\+|aft(er)?|from|hence)/i,
+    subtract: /^(\-|bef(ore)?|ago)/i,
+
+    yesterday: /^yes(terday)?/i,
+    today: /^t(od(ay)?)?/i,
+    tomorrow: /^tom(orrow)?/i,
+    now: /^n(ow)?/i,
+
+    millisecond: /^ms|milli(second)?s?/i,
+    second: /^sec(ond)?s?/i,
+    minute: /^mn|min(ute)?s?/i,
+    hour: /^h(our)?s?/i,
+    week: /^w(eek)?s?/i,
+    month: /^m(onth)?s?/i,
+    day: /^d(ay)?s?/i,
+    year: /^y(ear)?s?/i,
+
+    shortMeridian: /^(a|p)/i,
+    longMeridian: /^(a\.?m?\.?|p\.?m?\.?)/i,
+    timezone: /^((e(s|d)t|c(s|d)t|m(s|d)t|p(s|d)t)|((gmt)?\s*(\+|\-)\s*\d\d\d\d?)|gmt|utc)/i,
+    ordinalSuffix: /^\s*(st|nd|rd|th)/i,
+    timeContext: /^\s*(\:|a(?!u|p)|p)/i
+  },
+
+  timezones: [{name:"UTC", offset:"-000"}, {name:"GMT", offset:"-000"}, {name:"EST", offset:"-0500"}, {name:"EDT", offset:"-0400"}, {name:"CST", offset:"-0600"}, {name:"CDT", offset:"-0500"}, {name:"MST", offset:"-0700"}, {name:"MDT", offset:"-0600"}, {name:"PST", offset:"-0800"}, {name:"PDT", offset:"-0700"}]
+};
+
+/********************
+ ** Future Strings **
+ ********************
+ *
+ * The following list of strings may not be currently being used, but
+ * may be incorporated into the Datejs library later.
+ *
+ * We would appreciate any help translating the strings below.
+ *
+ * If you modify this file, please post your revised CultureInfo file
+ * to the Datejs Forum located at http://www.datejs.com/forums/.
+ *
+ * Please mark the subject of the post with [CultureInfo]. Example:
+ *    Subject: [CultureInfo] Translated "da-DK" Danish(Denmark)b
+ *
+ * English Name        Translated
+ * ------------------  -----------------
+ * about               about
+ * ago                 ago
+ * date                date
+ * time                time
+ * calendar            calendar
+ * show                show
+ * hourly              hourly
+ * daily               daily
+ * weekly              weekly
+ * bi-weekly           bi-weekly
+ * fortnight           fortnight
+ * monthly             monthly
+ * bi-monthly          bi-monthly
+ * quarter             quarter
+ * quarterly           quarterly
+ * yearly              yearly
+ * annual              annual
+ * annually            annually
+ * annum               annum
+ * again               again
+ * between             between
+ * after               after
+ * from now            from now
+ * repeat              repeat
+ * times               times
+ * per                 per
+ * min (abbrev minute) min
+ * morning             morning
+ * noon                noon
+ * night               night
+ * midnight            midnight
+ * mid-night           mid-night
+ * evening             evening
+ * final               final
+ * future              future
+ * spring              spring
+ * summer              summer
+ * fall                fall
+ * winter              winter
+ * end of              end of
+ * end                 end
+ * long                long
+ * short               short
+ */
+
+Date.i18n = i18n;
+//export * from './core';
 
 }());

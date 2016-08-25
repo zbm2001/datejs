@@ -1,8 +1,5 @@
-//import assign from './util/assign';
-//import typeOf from './util/typeOf';
-import i18n from './i18n/zh-CN';
-
-Date.i18n = i18n;
+import './util/assign';
+import typeOf from './util/typeOf';
 
   var ry = /y+/,
     rM = /M+/,
@@ -22,7 +19,7 @@ Date.i18n = i18n;
 
     rMdhmsG = /[Mdhms]+/g,
     rDigitsG = /\d+/g,
-    rPeriod = /^(last|past|next)([0-9]*)([dD]ays|[wW]eeks|[mM]onths|[qQ]uarters|[yY]ears|[cC]enturies)$/,
+    rPeriod = /^(this|last|past|next)([0-9]*)(days?|weeks?|months?|quarters?|years?|centuries?)$/i,
 
   // 每月天数（平年）
     perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
@@ -37,7 +34,7 @@ Date.i18n = i18n;
      * @returns {number} 当前日期对象的毫秒数
      */
     setTimeToFirst: function () {
-      return this.setHour(0, 0, 0, 0);
+      return this.setHours(0, 0, 0, 0);
     },
 
     /**
@@ -45,7 +42,7 @@ Date.i18n = i18n;
      * @returns {number} 当前日期对象的毫秒数
      */
     setTimeToLast: function () {
-      return this.setHour(23, 59, 59, 999);
+      return this.setHours(23, 59, 59, 999);
     },
 
     /**
@@ -54,7 +51,7 @@ Date.i18n = i18n;
      * @returns {number} 当前日期对象的毫秒数
      */
     setTimeByDate: function (date) {
-      return this.setHour(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+      return this.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
     },
 
     /**
@@ -221,8 +218,8 @@ Date.i18n = i18n;
      */
     getQuarterDays: function () {
       var quarter = this.getQuarter(), year;
-      if (quarter !== 0) {
-        return perQuarterDays[quarter];
+      if (quarter !== 1) {
+        return perQuarterDays[quarter - 1];
       }
       year = this.getFullYear();
       return year % 4 || !(year % 400) ? 90 : 91;
@@ -276,7 +273,7 @@ Date.i18n = i18n;
      */
     getQuarterDate: function () {
       var month = this.getMonth(),
-        days = month || this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function (a, b) {
+        days = month && this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function (a, b) {
             return a + b;
           }, 0);
       return days + this.getDate();
@@ -288,7 +285,7 @@ Date.i18n = i18n;
      */
     getYearDate: function () {
       var month = this.getMonth(),
-        days = month || this.getDaysPerMonth().slice(0, month).reduce(function (a, b) {
+        days = month && this.getDaysPerMonth().slice(0, month).reduce(function (a, b) {
             return a + b;
           }, 0);
       return days + this.getDate();
@@ -598,7 +595,7 @@ Date.i18n = i18n;
      * @param {string} format
      * @returns {string}
      */
-    format2: function (format) {
+    format: function (format) {
 
       format || ( format = Date.FORMAT );
 
@@ -678,7 +675,7 @@ Date.i18n = i18n;
      * @returns {number} range{90, 92}
      */
     getQuarterDays: function (quarter, year) {
-      return quarter !== 0 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
+      return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
     },
 
     /**
@@ -845,8 +842,7 @@ Date.i18n = i18n;
       diffEndDays = 0,
       classifier,
       classifierPlural,
-      thisClassifierDays,
-      number;
+      thisClassifierDays;
 
     // 设置开始时间为那天的 0 时计起
     start0.setTimeToFirst();
@@ -905,24 +901,27 @@ Date.i18n = i18n;
             switch (RegExp.$1) {
               // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
               case 'last':
-                diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
+                diffStartDays = -now.getDaysByPastClassifiers(classifier, number) + 1;
+                break;
               // past 表示过去的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
               case 'past':
-                thisClassifierDays = now.getDateByClassifier(classifier);
-                diffStartDays -= thisClassifierDays;
+                diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
+                thisClassifierDays = now.getDateByClassifier(classifier, number);
+                diffStartDays -= thisClassifierDays - 1;
                 diffEndDays -= thisClassifierDays;
                 break;
               // past 表示将来的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
               case 'next':
                 diffEndDays = now.getDaysByNextClassifiers(classifier, number);
-                thisClassifierDays = now.getRestDaysByClassifier(classifier);
-                diffStartDays += thisClassifierDays;
+                thisClassifierDays = now.getRestDaysByClassifier(classifier, number);
+                diffStartDays += thisClassifierDays + 1;
                 diffEndDays += thisClassifierDays;
                 break;
               default:
             }
           }
         }
+        throw new Error('Unknown time period definition: ' + 'period');
     }
     start.setDate(start.getDate() + diffStartDays);
     end.setDate(end.getDate() + diffEndDays);
