@@ -242,7 +242,7 @@ var rPeriod = /^(last|past|next)([0-9]*)([dD]ays|[wW]eeks|[mM]onths|[qQ]uarters|
 var perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 var perQuarterDays = [90, 91, 92, 92];
 // 扩展日期类的原型方法
-  assign(Date.prototype, {
+  Object.assign(Date.prototype, {
 
     /**
      * 设置日期对象的时间为 00:00:00 000
@@ -859,7 +859,7 @@ var perQuarterDays = [90, 91, 92, 92];
      * @returns {boolean}
      */
     isDate: function (date) {
-      return typeOf(date) === 'Date';
+      return Object.prototype.toString.call(date) === '[object Date]';
     },
 
     /**

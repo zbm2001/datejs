@@ -30,7 +30,7 @@ Date.i18n = i18n;
     perQuarterDays = [90, 91, 92, 92];
 
   // 扩展日期类的原型方法
-  assign(Date.prototype, {
+  Object.assign(Date.prototype, {
 
     /**
      * 设置日期对象的时间为 00:00:00 000
@@ -647,7 +647,7 @@ Date.i18n = i18n;
      * @returns {boolean}
      */
     isDate: function (date) {
-      return typeOf(date) === 'Date';
+      return Object.prototype.toString.call(date) === '[object Date]';
     },
 
     /**
