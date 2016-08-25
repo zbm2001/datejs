@@ -5,9 +5,9 @@ export default isNativeFunction(Object.assign) ? Object.assign :
     if (target == null) {
       throw new TypeError('Cannot convert undefined or null to object');
     }
-    var output = Object(target), i = 1, l = arguments.length, prop;
+    var output = Object(target), i = 1, l = arguments.length, prop, source;
     for (; i < l; i++) {
-      var source = arguments[i];
+      source = arguments[i];
       if (source != null) {
         for (prop in source) {
           if (source.hasOwnProperty(prop)) {

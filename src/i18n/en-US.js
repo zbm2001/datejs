@@ -1,4 +1,4 @@
-Date.i18n = {
+export default {
   /* Culture Name */
   name: "en-US",
   englishName: "English (United States)",
