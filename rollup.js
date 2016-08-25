@@ -1,9 +1,4 @@
 // 项目下直接命令 node rollup.js
-// import fs from 'fs';
-// import rollup from 'rollup';
-// import buble from 'rollup-plugin-buble';
-// import uglify from 'rollup-plugin-uglify';
-
 const fs = require('fs');
 const rollup = require('rollup');
 const buble = require('rollup-plugin-buble');

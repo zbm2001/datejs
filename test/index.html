@@ -3,23 +3,31 @@
 <head>
 <meta charset="utf-8">
 <title>datejs</title>
-<script src="../date.min.js"></script>
-</head>
-
-<body>
+<script src="../date.js"></script>
 <script>
 (function(){
-
-  var date = new Date();
+this.writeForin = function(obj, name){
   var html = '<ul><li>' + 
-  Object.keys(date.__proto__).map(function(key){
-    return 'date.' + key
+  Object.keys(obj).map(function(key){
+    return 'date.' + key + 
+    ' (' + (typeof obj[key] == 'function' ? '方法' : '属性') + ')';
   }).join('</li><li>') + 
   '</li></ul>'
 
   document.write(html);
-
+}
 })();
+</script>
+</head>
+
+<body>
+<h2>Date原型方法和属性</h2>
+<script>
+writeForin(Date.prototype, 'data');
+</script>
+<h2>Date静态方法和属性</h2>
+<script>
+writeForin(Date, 'Data');
 </script>
 </body>
 </html>

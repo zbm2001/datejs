@@ -5,42 +5,8 @@
  * @author: zbm2001@aliyun.com
  * @license: Apache 2.0
  */
-(function (exports) {
+(function () {
 'use strict';
-
-var toString = Object.prototype.toString;
-
-function typeOf(object) {
-  return toString.call(object).slice(8, -1);
-}
-
-var sPop = Array.prototype.pop + '';
-var sNativeCode = sPop.slice(sPop.indexOf('{'));
-
-function isNativeFunction(func) {
-  return typeOf(func) === 'Function' && sNativeCode === (func += '').slice(func.indexOf('{'));
-}
-
-var assign = isNativeFunction(Object.assign) ? Object.assign :
-  (Object.assign = function assign(target) {
-    var arguments$1 = arguments;
-
-    if (target == null) {
-      throw new TypeError('Cannot convert undefined or null to object');
-    }
-    var output = Object(target), i = 1, l = arguments.length, prop, source;
-    for (; i < l; i++) {
-      source = arguments$1[i];
-      if (source != null) {
-        for (prop in source) {
-          if (source.hasOwnProperty(prop)) {
-            output[prop] = source[prop];
-          }
-        }
-      }
-    }
-    return output;
-  });
 
 var i18n = {
   /* Culture Name */
@@ -252,6 +218,8 @@ var i18n = {
  * short               short
  */
 
+//import assign from './util/assign';
+//import typeOf from './util/typeOf';
 Date.i18n = i18n;
 
   var ry = /y+/;
@@ -883,7 +851,7 @@ var perQuarterDays = [90, 91, 92, 92];
   });
 
   // 扩展静态方法
-  assign(Date, {
+  Object.assign(Date, {
 
     /**
      * 判断是否为日期对象
@@ -1174,4 +1142,4 @@ var perQuarterDays = [90, 91, 92, 92];
     return [start, end];
   }
 
-}((this.Date = this.Date || {})));
+}());

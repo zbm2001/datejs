@@ -1,5 +1,5 @@
-import assign from './util/assign';
-import typeOf from './util/typeOf';
+//import assign from './util/assign';
+//import typeOf from './util/typeOf';
 import i18n from './i18n/zh-CN';
 
 Date.i18n = i18n;
@@ -639,7 +639,7 @@ Date.i18n = i18n;
   });
 
   // 扩展静态方法
-  assign(Date, {
+  Object.assign(Date, {
 
     /**
      * 判断是否为日期对象
