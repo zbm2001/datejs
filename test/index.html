@@ -15,7 +15,7 @@ this.writeForin = function(obj, name){
     return name + '.' + key + 
     ' (' + (typeof obj[key] == 'function' ? '方法' : '属性') + ')';
   }).join('</li><li>') + 
-  '</li></ul>'
+  '</li></ul>';
 
   document.write(html);
 }
