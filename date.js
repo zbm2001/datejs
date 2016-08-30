@@ -781,7 +781,13 @@ var perQuarterDays = [90, 91, 92, 92];
      * @param {string} format  'yyyy-MM-dd hh:mm:ss SSS' | 'yyyy-MM-ddThh:mm:ss.SSSZ' |  'yyyy-MM-dd' | 'MM/dd/yyyy' | ...
      * @returns {Date}
      */
-    parse: function (time, format) {
+    parse2Date: function (time, format) {
+
+      var M = Date.parse(time);
+
+      if(M === M){
+        return new Date(M);
+      }
 
       format = format ? format.replace(rMdhmsG, function (m) {
         return (m = m.charAt(0)) + m;

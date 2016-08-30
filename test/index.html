@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <title>datejs</title>
+<style>
+pre{ padding: 10px 20px; border:1px solid #666; border-radius:3px; font: .9em/1.5em Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+</style>
 <script src="../date.js"></script>
 <script>
 (function(){
@@ -21,6 +24,30 @@ this.writeForin = function(obj, name){
 </head>
 
 <body>
+<h2>Quick start</h2>
+<pre>
+// 创建一个日期对象
+var date = new Date();
+
+// 是否为闰年：
+date.isLeapYear() -> true
+
+// 获取本季度的天数：
+date.getQuarterDays() -> 92
+
+// 格式化为时间字符串：
+date.format() -> "2016-08-31 00:04:12 891"
+
+// 格式化为指定格式的时间字符串：
+date.format(Date.FORMAT_DATE) -> "2016-08-31"
+
+// 设置为当天的初始时间（0点）
+date.setTimeToFirst() -> 1472572800000
+
+// 格式化时间
+date.format() -> "2016-08-31 00:00:00 00"
+</pre>
+
 <h2>Date原型方法和属性</h2>
 <script>
 writeForin(Date.prototype, 'date');
