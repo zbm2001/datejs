@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>datejs</title>
+<title>日期对象扩展 datejs</title>
 <style>
 pre{ padding: 10px 20px; border:1px solid #666; border-radius:3px; font: .9em/1.5em Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif; }
 </style>
@@ -15,7 +15,7 @@ this.writeForin = function(obj, name){
     return name + '.' + key + 
     ' (' + (typeof obj[key] == 'function' ? '方法' : '属性') + ')';
   }).join('</li><li>') + 
-  '</li></ul>'
+  '</li></ul>';
 
   document.write(html);
 }
@@ -29,6 +29,9 @@ this.writeForin = function(obj, name){
 // 创建一个日期对象
 var date = new Date();
 
+// 默认输出：
+date -> Fri Aug 26 2016 10:45:58 GMT+0800 (中国标准时间)
+
 // 是否为闰年：
 date.isLeapYear() -> true
 
@@ -41,17 +44,18 @@ date.format() -> "2016-08-31 00:04:12 891"
 // 格式化为指定格式的时间字符串：
 date.format(Date.FORMAT_DATE) -> "2016-08-31"
 
-// 设置为当天的初始时间（0点）
-date.setTimeToFirst() -> 1472572800000
+// 设置日期的时间为零点 00:00:00 000，返回毫秒数：
+date.setTimeToFirst() -> 1472140800000
 
-// 格式化时间
-date.format() -> "2016-08-31 00:00:00 00"
+// 零点时间格式化为时间字符串输出：
+date.format() -> "2016-08-26 00:00:00 000"
 </pre>
 
 <h2>Date原型方法和属性</h2>
 <script>
 writeForin(Date.prototype, 'date');
 </script>
+
 <h2>Date静态方法和属性</h2>
 <script>
 writeForin(Date, 'Date');
