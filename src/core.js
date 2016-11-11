@@ -762,7 +762,8 @@ Object.assign(Date, {
   parse2Date: function(time, format) {
 
     var M = Date.parse(time);
-
+    // 若能正确解析，返回该时间的毫秒数
+    // 若不能正确解析，返回NaN
     if (M === M) {
       return new Date(M);
     }
