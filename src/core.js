@@ -9,17 +9,17 @@ var ry = /y+/,
   rs = /s+/,
   rS = /S+/,
 
-  ryG = /y+/g,
-  rMG = /M+/g,
-  rdG = /d+/g,
-  rhG = /h+/g,
-  rmG = /m+/g,
-  rsG = /s+/g,
-  rSG = /S+/g,
+  ry_g = /y+/g,
+  rM_g = /M+/g,
+  rd_g = /d+/g,
+  rh_g = /h+/g,
+  rm_g = /m+/g,
+  rs_g = /s+/g,
+  rS_g = /S+/g,
 
-  rMdhmsG = /[Mdhms]+/g,
-  rDigitsG = /\d+/g,
-  rPeriod = /^(this|last|past|next)([0-9]*)(days?|weeks?|months?|quarters?|years?|centuries?)$/i,
+  rMdhms_g = /[Mdhms]+/g,
+  rDigits_g = /\d+/g,
+  rPeriod = /^(this|last|past|next)\s*([0-9]*)\s*(days?|weeks?|months?|quarters?|years?|century|centuries)$/i,
 
   // 每月天数（平年）
   perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
@@ -760,38 +760,43 @@ Object.assign(Date, {
    * @returns {Date}
    */
   parse2Date: function(time, format) {
+    // 若为毫秒数
+    if (typeof time === 'number') {
+      return new Date(time);
+    }
+    time = String(time);
 
-    var M = Date.parse(time);
     // 若能正确解析，返回该时间的毫秒数
     // 若不能正确解析，返回NaN
+    var M = Date.parse(time);
     if (M === M) {
       return new Date(M);
     }
 
-    format = format ? format.replace(rMdhmsG, function(m) {
+    format = format ? format.replace(rMdhms_g, function(m) {
       return (m = m.charAt(0)) + m;
     }) : Date.FORMAT;
 
-    time = time.replace(rDigitsG, function(m) {
+    time = time.replace(rDigits_g, function(m) {
       return m.length < 2 ? '0' + m : m;
     });
 
     var r, m, n,
       d = new Date,
       a = [
-        [ryG, "setFullYear"] //year
+        [ry_g, "setFullYear"] //year
         ,
-        [rMG, "setRealMonth"] //month + 1
+        [rM_g, "setRealMonth"] //month + 1
         ,
-        [rdG, "setDate"] //day
+        [rd_g, "setDate"] //day
         ,
-        [rhG, "setHours"] //hour
+        [rh_g, "setHours"] //hour
         ,
-        [rmG, "setMinutes"] //minute
+        [rm_g, "setMinutes"] //minute
         ,
-        [rsG, "setSeconds"] //second
+        [rs_g, "setSeconds"] //second
         ,
-        [rSG, "setMilliseconds"] //millisecond
+        [rS_g, "setMilliseconds"] //millisecond
       ],
       i = -1,
       l = a.length;
@@ -799,7 +804,7 @@ Object.assign(Date, {
     while (++i < l) {
       r = a[i][0];
       m = a[i][1];
-      d[m](r.test(format) ? parseInt(time.slice(r.lastIndex - RegExp.lastMatch.length, r.lastIndex)) : 0);
+      d[m](r.test(format) ? parseInt(time.slice(r.lastIndex - RegExp.lastMatch.length, r.lastIndex)) || 0 : 0);
       r.lastIndex = 0;
     }
     return d;
@@ -950,7 +955,7 @@ function parse2DatesByPeriod(period) {
           }
         }
       }
-      throw new Error('Unknown time period definition: ' + 'period');
+      throw new Error('Unknown time period definition: ' + period);
   }
   start.setDate(start.getDate() + diffStartDays);
   end.setDate(end.getDate() + diffEndDays);
