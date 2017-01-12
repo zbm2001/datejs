@@ -1,5 +1,4 @@
-import './util/assign';
-import typeOf from './util/typeOf';
+import {typeOf} from 'z-utils/utils';
 import i18n from './i18n';
 
 var ry = /y+/,
@@ -26,6 +25,8 @@ var ry = /y+/,
   perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
   // 每季度天数（平年）
   perQuarterDays = [90, 91, 92, 92];
+
+Date.i18n = i18n;
 
 // 扩展日期类的原型方法
 Object.assign(Date.prototype, {
@@ -782,8 +783,131 @@ Object.assign(Date.prototype, {
 
 });
 
+/**
+ * 验证与时间相关数值合法性
+ * @param {Number} n 需要验证数值
+ * @param {Number} min 指定数值范围的最小值
+ * @param {Number} max 指定数值范围的最大值
+ * @param {String} name 
+ * @returns {Boolean}
+ */
+function validate(n, min, max, name) {
+  if (n == null) {
+    return false;
+  }
+  if (typeof n != "number") {
+    throw new TypeError(n + " is not a Number.");
+  } else if (n < min || n > max) {
+    throw new RangeError(n + " is not a valid value for " + name + ".");
+  }
+  return true;
+}
+
+/**
+ * 解析时段用语，返回起始和结束两个日期对象的数组
+ * @param {string} period
+ * @returns {Array.<Date>} length{2}
+ */
+function parse2DatesByPeriod(period) {
+
+  var now = new Date(),
+    start,
+    start0 = new Date(),
+    end,
+    end2 = new Date(),
+    diffStartDays = 0,
+    diffEndDays = 0,
+    classifier,
+    classifierPlural,
+    thisClassifierDays;
+
+  // 设置开始时间为那天的 0 时计起
+  start0.setTimeToFirst();
+  start = start0;
+  // 设置结束时间为那天的最后一毫秒截止
+  end2.setTimeToLast();
+  end = end2;
+
+  switch (period) {
+    case 'today': // 今天
+      diffStartDays = 0;
+      break;
+    case 'yesterday': // 昨天
+      diffStartDays = -1;
+      diffEndDays = -1;
+      break;
+    case 'thisWeek': // 本周
+      diffStartDays = 1 - start.getDay();
+      break;
+    case 'lastWeek': // 上周
+      diffEndDays = -end.getDay();
+      diffStartDays = diffEndDays + 1 - 7;
+      break;
+    case 'thisMonth': // 本月
+      diffStartDays = 1 - start.getDate();
+      break;
+    case 'lastMonth': // 上月
+      diffEndDays = -end.getDate();
+      now.setDate(0);
+      diffStartDays = diffEndDays + 1 - now.getMonthDays();
+      break;
+    case 'thisQuarter': // 本季度
+      diffStartDays = 1 - start.getQuarterDate();
+      break;
+    case 'lastQuarter': // 上季度
+      diffEndDays = -end.getQuarterDate();
+      now.setDate(diffEndDays + now.getDate());
+      diffStartDays = diffEndDays + 1 - now.getQuarterDays();
+      break;
+    case 'thisYear': // 本年
+      diffStartDays = 1 - start.getYearDate();
+      break;
+    case 'lastYear': // 上年
+      diffEndDays = -end.getYearDate();
+      now.setFullYear(now.getFullYear() - 1);
+      diffStartDays = diffEndDays + 1 - now.getYearDays();
+      break;
+    default:
+      // last7days, last30days, last90days, last365days...
+      // last5months, last3Quarter, last2years, last1centuries...
+      // past10days, past4months...
+      if (rPeriod.test(period) && (number = parseInt(RegExp.$2)) > 0) {
+        classifierPlural = RegExp.$3;
+        if (classifier = Date.pluralClassifiers[classifierPlural]) {
+
+          switch (RegExp.$1) {
+            // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
+            case 'last':
+              diffStartDays = -now.getDaysByPastClassifiers(classifier, number) + 1;
+              break;
+              // past 表示过去的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
+            case 'past':
+              diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
+              thisClassifierDays = now.getDateByClassifier(classifier, number);
+              diffStartDays -= thisClassifierDays - 1;
+              diffEndDays -= thisClassifierDays;
+              break;
+              // past 表示将来的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
+            case 'next':
+              diffEndDays = now.getDaysByNextClassifiers(classifier, number);
+              thisClassifierDays = now.getRestDaysByClassifier(classifier, number);
+              diffStartDays += thisClassifierDays + 1;
+              diffEndDays += thisClassifierDays;
+              break;
+            default:
+          }
+        }
+      }
+      throw new Error('Unknown time period definition: ' + period);
+  }
+  start.setDate(start.getDate() + diffStartDays);
+  end.setDate(end.getDate() + diffEndDays);
+
+  return [start, end];
+}
+
 // 扩展静态方法
-Object.assign(Date, {
+export default Object.assign(Date, {
 
   /**
    * 判断是否为日期对象
@@ -791,7 +915,7 @@ Object.assign(Date, {
    * @returns {boolean}
    */
   isDate: function(date) {
-    return Object.prototype.toString.call(date) === '[object Date]';
+    return typeOf(date) === '[object Date]';
   },
 
 
@@ -1126,131 +1250,4 @@ Object.assign(Date, {
   // 匹配时段语句的正则表达式
   rPeriod: rPeriod
 
-});
-
-/**
- * 验证与时间相关数值合法性
- * @param {Number} n 需要验证数值
- * @param {Number} min 指定数值范围的最小值
- * @param {Number} max 指定数值范围的最大值
- * @param {String} name 
- * @returns {Boolean}
- */
-function validate(n, min, max, name) {
-  if (n == null) {
-    return false;
-  }
-  if (typeof n != "number") {
-    throw new TypeError(n + " is not a Number.");
-  } else if (n < min || n > max) {
-    throw new RangeError(n + " is not a valid value for " + name + ".");
-  }
-  return true;
-}
-
-/**
- * 解析时段用语，返回起始和结束两个日期对象的数组
- * @param {string} period
- * @returns {Array.<Date>} length{2}
- */
-function parse2DatesByPeriod(period) {
-
-  var now = new Date(),
-    start,
-    start0 = new Date(),
-    end,
-    end2 = new Date(),
-    diffStartDays = 0,
-    diffEndDays = 0,
-    classifier,
-    classifierPlural,
-    thisClassifierDays;
-
-  // 设置开始时间为那天的 0 时计起
-  start0.setTimeToFirst();
-  start = start0;
-  // 设置结束时间为那天的最后一毫秒截止
-  end2.setTimeToLast();
-  end = end2;
-
-  switch (period) {
-    case 'today': // 今天
-      diffStartDays = 0;
-      break;
-    case 'yesterday': // 昨天
-      diffStartDays = -1;
-      diffEndDays = -1;
-      break;
-    case 'thisWeek': // 本周
-      diffStartDays = 1 - start.getDay();
-      break;
-    case 'lastWeek': // 上周
-      diffEndDays = -end.getDay();
-      diffStartDays = diffEndDays + 1 - 7;
-      break;
-    case 'thisMonth': // 本月
-      diffStartDays = 1 - start.getDate();
-      break;
-    case 'lastMonth': // 上月
-      diffEndDays = -end.getDate();
-      now.setDate(0);
-      diffStartDays = diffEndDays + 1 - now.getMonthDays();
-      break;
-    case 'thisQuarter': // 本季度
-      diffStartDays = 1 - start.getQuarterDate();
-      break;
-    case 'lastQuarter': // 上季度
-      diffEndDays = -end.getQuarterDate();
-      now.setDate(diffEndDays + now.getDate());
-      diffStartDays = diffEndDays + 1 - now.getQuarterDays();
-      break;
-    case 'thisYear': // 本年
-      diffStartDays = 1 - start.getYearDate();
-      break;
-    case 'lastYear': // 上年
-      diffEndDays = -end.getYearDate();
-      now.setFullYear(now.getFullYear() - 1);
-      diffStartDays = diffEndDays + 1 - now.getYearDays();
-      break;
-    default:
-      // last7days, last30days, last90days, last365days...
-      // last5months, last3Quarter, last2years, last1centuries...
-      // past10days, past4months...
-      if (rPeriod.test(period) && (number = parseInt(RegExp.$2)) > 0) {
-        classifierPlural = RegExp.$3;
-        if (classifier = Date.pluralClassifiers[classifierPlural]) {
-
-          switch (RegExp.$1) {
-            // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
-            case 'last':
-              diffStartDays = -now.getDaysByPastClassifiers(classifier, number) + 1;
-              break;
-              // past 表示过去的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
-            case 'past':
-              diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
-              thisClassifierDays = now.getDateByClassifier(classifier, number);
-              diffStartDays -= thisClassifierDays - 1;
-              diffEndDays -= thisClassifierDays;
-              break;
-              // past 表示将来的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
-            case 'next':
-              diffEndDays = now.getDaysByNextClassifiers(classifier, number);
-              thisClassifierDays = now.getRestDaysByClassifier(classifier, number);
-              diffStartDays += thisClassifierDays + 1;
-              diffEndDays += thisClassifierDays;
-              break;
-            default:
-          }
-        }
-      }
-      throw new Error('Unknown time period definition: ' + period);
-  }
-  start.setDate(start.getDate() + diffStartDays);
-  end.setDate(end.getDate() + diffEndDays);
-
-  return [start, end];
-}
-
-Date.i18n = i18n;
-
-export default Date;
+})
