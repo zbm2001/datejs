@@ -20,11 +20,11 @@ module.exports = {
       browser: true,
     }),
     commonjs(),
-    // babel 支持 tree 最少引用解析
+    // babel 遵循 es2015+ 标准，但执行较慢
     // babel({
     //   exclude: 'node_modules/**'
     // }),
-    // 结合 buble 比 babel 更快
+    // 结合 buble 比 babel 执行更快
     buble({
       exclude: 'node_modules/**'
     }),

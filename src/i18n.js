@@ -1,10 +1,3 @@
-// import fs from 'fs';
-// import path from 'path';
-// import getDirModules from './util/getDirModules';
-
-// var dir = path.join(path.dirname(__dirname), 'i18n');
-// var CultureInfos = getDirModules(dir);
-
 import CultureInfo_0 from './i18n/en-US';
 import CultureInfo_1 from './i18n/zh-CN';
 
@@ -23,4 +16,4 @@ function getCultureInfo() {
 export default {
 	CultureInfos,
 	getCultureInfo
-};
+}

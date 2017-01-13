@@ -1,6 +1,6 @@
 /*
  * @name: datejs
- * @version: 1.0.0
+ * @version: 1.0.1
  * @description: javascript Date Object extend
  * @author: zbm2001@aliyun.com
  * @license: Apache 2.0
@@ -554,13 +554,6 @@ var CultureInfo_1 = {
  * long                long
  * short               short
  */
-
-// import fs from 'fs';
-// import path from 'path';
-// import getDirModules from './util/getDirModules';
-
-// var dir = path.join(path.dirname(__dirname), 'i18n');
-// var CultureInfos = getDirModules(dir);
 
 var CultureInfos = [CultureInfo_0, CultureInfo_1];
 
@@ -1477,7 +1470,7 @@ function parse2DatesByPeriod(period) {
 }
 
 // 扩展静态方法
-var core$1 = Object.assign(Date, {
+Object.assign(Date, {
 
   /**
    * 判断是否为日期对象
@@ -1820,6 +1813,6 @@ var core$1 = Object.assign(Date, {
   // 匹配时段语句的正则表达式
   rPeriod: rPeriod
 
-});
+})
 
-module.exports = core$1;
+module.exports = Date;

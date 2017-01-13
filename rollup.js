@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const rollup = require('rollup');
-// const buble = require('rollup-plugin-buble');
 const uglifyjs = require('uglify-js');
 // const uglify = require('rollup-plugin-uglify');
 const pkg = require('./package.json');
