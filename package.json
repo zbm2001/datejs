@@ -1,6 +1,6 @@
 {
   "name": "z-date",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "javascript Date Object extend",
   "scripts": {
     "build": "rollup -c",
