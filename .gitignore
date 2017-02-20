@@ -3,8 +3,9 @@ logs
 *.log
 npm-debug.log*
 
+doc/
 node_modules/
 dist/
 .project
 .idea
-gulpfile.js
+.esdoc.json

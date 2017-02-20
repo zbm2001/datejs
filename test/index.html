@@ -13,7 +13,7 @@ this.writeForin = function(obj, name){
   var html = '<ul><li>' + 
   Object.keys(obj).map(function(key){
     return name + '.' + key + 
-    ' (' + (typeof obj[key] == 'function' ? '方法' : '属性') + ')';
+    ' (' + (typeof obj[key] == 'function' ? '方法' : '属性') + ')  ';
   }).join('</li><li>') + 
   '</li></ul>';
 
