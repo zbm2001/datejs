@@ -40,25 +40,25 @@ module.exports = {
       dest: 'index.js',
       format: 'cjs'
     }/*, {
-     dest: 'data.amd.js',
+     dest: 'date.amd.js',
      format: 'amd'
      }, {
-     dest: 'data.cjs.js',
+     dest: 'date.cjs.js',
      format: 'cjs'
      }, {
-     dest: 'data.es.js',
+     dest: 'date.es.js',
      format: 'es'
      }, {
-     dest: 'data.iife.js',
+     dest: 'date.iife.js',
      format: 'iife'
      }, {
-     dest: 'data.umd.js',
+     dest: 'date.umd.js',
      format: 'umd'
      }*/
   ],
   banner: banner,
   // format: 'iife', // cjs amd es6 umd iife
-  moduleName: 'data', // umd 或 iife 模式下，若入口文件含 export，必须加上该属性
-  // dest: 'data.js', // 输出文件
+  moduleName: 'date', // umd 或 iife 模式下，若入口文件含 export，必须加上该属性
+  // dest: 'date.js', // 输出文件
   // sourceMap: false   // 调试编译
 }
