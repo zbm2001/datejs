@@ -1,3 +1,1 @@
-import './core';
-
-export default Date
+export {default} from './core'

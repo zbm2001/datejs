@@ -1,5 +1,5 @@
-import {typeOf} from 'z-utils/utils';
-import i18n from './i18n';
+import {typeOf, assign} from 'z-utils/src';
+import {default as i18n, getCultureInfo} from './i18n';
 
 var ry = /y+/,
   rM = /M+/,
@@ -29,7 +29,7 @@ var ry = /y+/,
 Date.i18n = i18n;
 
 // 扩展日期类的原型方法
-Object.assign(Date.prototype, {
+assign(Date.prototype, {
 
   /**
    * 设置日期对象的时间为 00:00:00 000
@@ -907,7 +907,7 @@ function parse2DatesByPeriod(period) {
 }
 
 // 扩展静态方法
-export default Object.assign(Date, {
+export default assign(Date, {
 
   /**
    * 判断是否为日期对象
@@ -1200,7 +1200,7 @@ export default Object.assign(Date, {
    * @returns {String} 如：UTC|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT
    */
   getTimezoneAbbreviation: function(offset) {
-    var CultureInfo = i18n.getCultureInfo(),
+    var CultureInfo = getCultureInfo(),
       timezones = CultureInfo.timezones;
     for (let i = 0, l = timezones.length; i < l; i++) {
       if (timezones[i].offset === offset) {
@@ -1216,7 +1216,7 @@ export default Object.assign(Date, {
    * @returns {String} The 4-character offset string prefixed with + or - (e.g. "-0500")
    */
   getTimezoneOffset: function(name) {
-    var CultureInfo = i18n.getCultureInfo(),
+    var CultureInfo = getCultureInfo(),
       timezones = CultureInfo.timezones;
     for (let i = 0, l = timezones.length; i < l; i++) {
       if (timezones[i].name === name.toUpperCase()) {

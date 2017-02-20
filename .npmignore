@@ -1,6 +1,9 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
 node_modules/
-src/
-test/
 .project
 .idea
 rollup.config.js
