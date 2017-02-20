@@ -1,5 +1,5 @@
-import './util/assign';
-import typeOf from './util/typeOf';
+import {typeOf, assign} from 'z-utils/src';
+import {default as i18n, getCultureInfo} from './i18n';
 
 var ry = /y+/,
   rM = /M+/,
@@ -9,25 +9,27 @@ var ry = /y+/,
   rs = /s+/,
   rS = /S+/,
 
-  ryG = /y+/g,
-  rMG = /M+/g,
-  rdG = /d+/g,
-  rhG = /h+/g,
-  rmG = /m+/g,
-  rsG = /s+/g,
-  rSG = /S+/g,
+  ry_g = /y+/g,
+  rM_g = /M+/g,
+  rd_g = /d+/g,
+  rh_g = /h+/g,
+  rm_g = /m+/g,
+  rs_g = /s+/g,
+  rS_g = /S+/g,
 
-  rMdhmsG = /[Mdhms]+/g,
-  rDigitsG = /\d+/g,
-  rPeriod = /^(this|last|past|next)([0-9]*)(days?|weeks?|months?|quarters?|years?|centuries?)$/i,
+  rMdhms_g = /[Mdhms]+/g,
+  rDigits_g = /\d+/g,
+  rPeriod = /^(this|last|past|next)\s*([0-9]*)\s*(days?|weeks?|months?|quarters?|years?|century|centuries)$/i,
 
   // 每月天数（平年）
   perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
   // 每季度天数（平年）
   perQuarterDays = [90, 91, 92, 92];
 
+Date.i18n = i18n;
+
 // 扩展日期类的原型方法
-Object.assign(Date.prototype, {
+assign(Date.prototype, {
 
   /**
    * 设置日期对象的时间为 00:00:00 000
@@ -55,6 +57,14 @@ Object.assign(Date.prototype, {
   },
 
   /**
+   * 设置时间与当前日期对象的时间一致 hh:mm:ss SSS
+   * @returns {number} 当前日期对象的毫秒数
+   */
+  setTimeByNow: function() {
+    return this.setTimeByDate(new Date());
+  },
+
+  /**
    * 与另一个日期对象比较毫秒数大小
    * @param {Date} date
    * @returns {number} range{-1,0,1}
@@ -63,7 +73,44 @@ Object.assign(Date.prototype, {
     if (Date.isDate(date)) {
       return this < date ? -1 : this > date ? 1 : 0;
     }
-    throw new TypeError(date + "is not a Date object");
+    throw new TypeError(date + " is not a Date object");
+  },
+
+  /**
+   * 判断与另一个日期对象的毫秒数一致
+   * @param {Date} date
+   * @returns {Boolean}
+   */
+  equals: function(date) {
+    return this.compareTo(date) === 0;
+  },
+
+  /**
+   * 判断比另一个日期对象的毫秒数小
+   * @param {Date} date
+   * @returns {Boolean}
+   */
+  isBefore: function(date) {
+    return this.compareTo(date) < 0;
+  },
+
+  /**
+   * 判断比另一个日期对象的毫秒数大
+   * @param {Date} date
+   * @returns {Boolean}
+   */
+  isAfter: function(date) {
+    return this.compareTo(date) > 0;
+  },
+
+  /**
+   * 判断在某个起止时间段内
+   * @param {Date} start 起始时间
+   * @param {Date} end 结束时间
+   * @returns {Boolean}
+   */
+  between: function(start, end) {
+    return this.compareTo(start) >= 0 && this.compareTo(end) <= 0;
   },
 
   /**
@@ -166,15 +213,10 @@ Object.assign(Date.prototype, {
    * @returns {number} 当前日期对象的毫秒数
    */
   setNaturalMonth: function(month) {
-    month = Number(month);
-    if (typeof month === 'number') {
-      month = parseInt(month);
-      if (month === 0) {
-        return this.getTime();
-      }
-      month > 0 && month--;
+    if (Date.validateNaturalMonth(month)) {
+      return this.setMonth(month - 1);
     }
-    return this.setMonth(month);
+    this.getTime();
   },
 
   /**
@@ -597,6 +639,103 @@ Object.assign(Date.prototype, {
   },
 
   /**
+   * 通过一组配置项设置时间
+   * @param {Object} config
+   * @returns {Object} this
+   */
+  set: function(config) {
+    if (Date.validateMillisecond(config.millisecond)) {
+      this.addMilliseconds(config.millisecond - this.getMilliseconds());
+    }
+
+    if (Date.validateSecond(config.second)) {
+      this.addSeconds(config.second - this.getSeconds());
+    }
+
+    if (Date.validateMinute(config.minute)) {
+      this.addMinutes(config.minute - this.getMinutes());
+    }
+
+    if (Date.validateHour(config.hour)) {
+      this.addHours(config.hour - this.getHours());
+    }
+
+    if (Date.validateMonth(config.month)) {
+      this.addMonths(config.month - this.getMonth());
+    }
+
+    if (Date.validateYear(config.year)) {
+      this.addYears(config.year - this.getFullYear());
+    }
+
+    /* day has to go last because you can't validate the day without first knowing the month */
+    if (Date.validateDay(config.day, this.getMonth(), this.getFullYear())) {
+      this.addDays(config.day - this.getDate());
+    }
+
+    if (config.timezone) {
+      this.setTimezone(config.timezone);
+    }
+
+    if (config.timezoneOffset) {
+      this.setTimezoneOffset(config.timezoneOffset);
+    }
+
+    if (config.week && validate(config.week, 0, 53, "week")) {
+      this.setWeek(config.week);
+    }
+
+    return this;
+  },
+
+  /**
+   * Get the offset from UTC of the current date.
+   * @return {String} The 4-character offset string prefixed with + or - (e.g. "-0500")
+   */
+  getUTCOffset: function() {
+    var n = this.getTimezoneOffset() * -10 / 6,
+      r;
+    if (n < 0) {
+      r = (n - 10000).toString();
+      return r.charAt(0) + r.substr(2);
+    } else {
+      r = (n + 10000).toString();
+      return "+" + r.substr(1);
+    }
+  },
+
+  /**
+   * Get the time zone abbreviation of the current date.
+   * @return {String} The abbreviated time zone name (e.g. "EST")
+   */
+  getTimezone: function() {
+    return Date.getTimezoneAbbreviation(this.getUTCOffset());
+  },
+
+  /**
+   * Set the time zone abbreviation of the current date.
+   * @param {string} offset
+   * @return {String} The abbreviated time zone name (e.g. "EST")
+   */
+  setTimezoneOffset: function(offset) {
+    // 返回协调通用时间(UTC)与当前主机时间之间的分钟差值
+    // 函数的返回值为Number类型，返回当前计算机上的时间和UTC时间之间相差的分钟数。
+    // 一般而言，如果当地时间早于UTC时间(在UTC时区以东，例如亚洲地区)，则返回值为负；如果当地时间晚于UTC时间(在UTC时区以西，例如美洲地区)，则返回值为正。
+    var here = this.getTimezoneOffset(),
+      there = Number(offset) * -6 / 10;
+    return this.addMinutes(there - here);
+  },
+
+  /**
+   * Set the time zone abbreviation of the current date.
+   * @param {string} offset
+   * @return {String} The abbreviated time zone name (e.g. "EST")
+   */
+  setTimezone: function(offset) {
+    return this.setTimezoneOffset(Date.getTimezoneOffset(offset));
+  },
+
+  /**
    * 返回格式化后的日期格式
    * @param {string} format
    * @returns {string}
@@ -608,14 +747,10 @@ Object.assign(Date.prototype, {
     var date = this,
       a = [
         //[ry, "getFullYear"] //year
-        [rM, "getNaturalMonth"] //month + 1
-        ,
-        [rd, "getDate"] //day
-        ,
-        [rh, "getHours"] //hour
-        ,
-        [rm, "getMinutes"] //minute
-        ,
+        [rM, "getNaturalMonth"], //month + 1
+        [rd, "getDate"], //day
+        [rh, "getHours"], //hour
+        [rm, "getMinutes"], //minute
         [rs, "getSeconds"] //second
         //,[rS, "getMilliseconds"] //millisecond
         //,["q", "getQuarter"]  //quarter
@@ -648,211 +783,25 @@ Object.assign(Date.prototype, {
 
 });
 
-// 扩展静态方法
-Object.assign(Date, {
-
-  /**
-   * 判断是否为日期对象
-   * @param {Date} date
-   * @returns {boolean}
-   */
-  isDate: function(date) {
-    return Object.prototype.toString.call(date) === '[object Date]';
-  },
-
-  /**
-   * 获取某年每月天数的数组
-   * @param {number} year 年份
-   * @returns {Array.<number>}
-   */
-  getDaysPerMonth: function(year) {
-    var d = perMonthDays.slice();
-    Date.isLeapYear(year) && (d[1] = 29);
-    return d;
-  },
-
-  /**
-   * 获取某年某月份的天数
-   * @param {number} month 月份
-   * @param {number} year 年份
-   * @returns {number} range{28, 31}
-   */
-  getMonthDays: function(month, year) {
-    return month !== 2 ? perMonthDays[month - 1] : year % 4 || !(year % 400) ? 28 : 29;
-  },
-
-  /**
-   * 获取某年某季度的天数
-   * @param {number} quarter 季度
-   * @param {number} year 年份
-   * @returns {number} range{90, 92}
-   */
-  getQuarterDays: function(quarter, year) {
-    return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
-  },
-
-  /**
-   * 获取某年份的天数
-   * @param {number} year 年份
-   * @returns {number} range{365,366}
-   */
-  getYearDays: function(year) {
-    return year % 4 || !(year % 400) ? 365 : 366;
-  },
-
-  /**
-   * 获取某世纪的天数
-   * @param {number} century 世纪
-   * @returns {number} range{36523,36524}
-   */
-  getCenturyDays: function(century) {
-    var days = 0,
-      startYear = (Math.abs(century) - 1) * 100;
-
-    days += (100) * 365 + parseInt(99 / 4);
-    // 若本世纪元年为闰年，再加一天
-    !(startYear % 400) && days++;
-
-    return days;
-  },
-
-  /**
-   * 获取某年份所属世纪的天数
-   * @param {number} year 年份
-   * @returns {number} range{36523,36524}
-   */
-  getCenturyDaysByYear: function(year) {
-    var century = Date.getCentury(year);
-    return Date.getCenturyDays(century);
-  },
-
-  /**
-   * 获取某年份所属的世纪数
-   * @param {number} year
-   * @returns {number}
-   */
-  getCentury: function(year) {
-    return parseInt(year / 100) + (year < 0 ? 1 : -1);
-  },
-
-  /**
-   * 判断年份是否为闰年
-   * @param {number} year 年份
-   * @returns {boolean}
-   */
-  isLeapYear: function(year) {
-    return !(year % 4 || !(year % 400));
-  },
-
-  /**
-   * 判断年份是否为平年
-   * @param {number} year 年份
-   * @returns {boolean}
-   */
-  isAverageYear: function(year) {
-    return !!(year % 4) || !(year % 400);
-  },
-
-  /**
-   * 解析格式化的日期，返回相应的日期对象
-   * @param {string} time '2012-3-13 11:11:11 111' | '2012-3-13T11:11:11.111Z' | '2012-3-13' | '3/13/2012' | ...
-   * @param {string} format  'yyyy-MM-dd hh:mm:ss SSS' | 'yyyy-MM-ddThh:mm:ss.SSSZ' |  'yyyy-MM-dd' | 'MM/dd/yyyy' | ...
-   * @returns {Date}
-   */
-  parse2Date: function(time, format) {
-
-    var M = Date.parse(time);
-
-    if (M === M) {
-      return new Date(M);
-    }
-
-    format = format ? format.replace(rMdhmsG, function(m) {
-      return (m = m.charAt(0)) + m;
-    }) : Date.FORMAT;
-
-    time = time.replace(rDigitsG, function(m) {
-      return m.length < 2 ? '0' + m : m;
-    });
-
-    var r, m, n,
-      d = new Date,
-      a = [
-        [ryG, "setFullYear"] //year
-        ,
-        [rMG, "setRealMonth"] //month + 1
-        ,
-        [rdG, "setDate"] //day
-        ,
-        [rhG, "setHours"] //hour
-        ,
-        [rmG, "setMinutes"] //minute
-        ,
-        [rsG, "setSeconds"] //second
-        ,
-        [rSG, "setMilliseconds"] //millisecond
-      ],
-      i = -1,
-      l = a.length;
-
-    while (++i < l) {
-      r = a[i][0];
-      m = a[i][1];
-      d[m](r.test(format) ? parseInt(time.slice(r.lastIndex - RegExp.lastMatch.length, r.lastIndex)) : 0);
-      r.lastIndex = 0;
-    }
-    return d;
-  },
-
-  /**
-   * 解析时段用语，返回起始和结束两个时间格式字符串的数组
-   * @param {string} period
-   * @param {string} format
-   * @returns {Array.<string>}
-   */
-  parse2DateFormatsByPeriod: function(period, format) {
-    var dates = parse2DatesByPeriod(period);
-    format || (format = Date.FORMAT);
-    return [
-      dates[0].format(format),
-      dates[1].format(format)
-    ];
-  },
-
-  /**
-   * 解析时段用语，返回起始和结束两个日期对象的数组
-   * @param {string} period
-   * @returns {Array.<Date>}
-   */
-  parse2DateObjectsByPeriod: function(period) {
-    return parse2DatesByPeriod(period);
-  },
-
-  FORMAT: 'yyyy-MM-dd hh:mm:ss SSS',
-  FORMAT_DATE: 'yyyy-MM-dd',
-  FORMAT_DATETIME: 'yyyy-MM-dd hh:mm:ss',
-
-  UTC_FORMAT: 'yyyy-MM-ddThh:mm:ss.SSSZ',
-
-  // Hash表：时间量词复数词对应原词
-  // 毫秒、秒、分钟、小时、天、周、月、季度、年、世纪
-  pluralClassifiers: {
-    milliseconds: "millisecond",
-    seconds: "second",
-    minutes: "minute",
-    hours: "hour",
-    days: "day",
-    weeks: "week",
-    months: "month",
-    quarters: "quarter",
-    years: "year",
-    centuries: "century"
-  },
-
-  // 匹配时段语句的正则表达式
-  rPeriod: rPeriod
-
-});
+/**
+ * 验证与时间相关数值合法性
+ * @param {Number} n 需要验证数值
+ * @param {Number} min 指定数值范围的最小值
+ * @param {Number} max 指定数值范围的最大值
+ * @param {String} name 
+ * @returns {Boolean}
+ */
+function validate(n, min, max, name) {
+  if (n == null) {
+    return false;
+  }
+  if (typeof n != "number") {
+    throw new TypeError(n + " is not a Number.");
+  } else if (n < min || n > max) {
+    throw new RangeError(n + " is not a valid value for " + name + ".");
+  }
+  return true;
+}
 
 /**
  * 解析时段用语，返回起始和结束两个日期对象的数组
@@ -949,7 +898,7 @@ function parse2DatesByPeriod(period) {
           }
         }
       }
-      throw new Error('Unknown time period definition: ' + 'period');
+      throw new Error('Unknown time period definition: ' + period);
   }
   start.setDate(start.getDate() + diffStartDays);
   end.setDate(end.getDate() + diffEndDays);
@@ -957,4 +906,348 @@ function parse2DatesByPeriod(period) {
   return [start, end];
 }
 
-export default Date;
+// 扩展静态方法
+export default assign(Date, {
+
+  /**
+   * 判断是否为日期对象
+   * @param {Date} date
+   * @returns {boolean}
+   */
+  isDate: function(date) {
+    return typeOf(date) === '[object Date]';
+  },
+
+
+  /**
+   * 验证每秒的毫秒数值范围
+   * @param {Number} range{0, 999}
+   * @return {Boolean}
+   */
+  validateMillisecond: function(value) {
+    return validate(value, 0, 999, "millisecond");
+  },
+
+  /**
+   * 验证每分钟的秒数值范围
+   * @param {Number} range{0, 59}
+   * @return {Boolean}
+   */
+  validateSecond: function(value) {
+    return validate(value, 0, 59, "second");
+  },
+
+  /**
+   * 验证每小时的分钟数值范围
+   * @param {Number} range{0, 59}
+   * @return {Boolean}
+   */
+  validateMinute: function(value) {
+    return validate(value, 0, 59, "minute");
+  },
+
+  /**
+   * 验证每天的小时数值范围
+   * @param {Number} range{0, 23}
+   * @return {Boolean}
+   */
+  validateHour: function(value) {
+    return validate(value, 0, 23, "hour");
+  },
+
+  /**
+   * 验证每周的天数值范围
+   * @param {Number} range{0, 6}
+   * @return {Boolean}
+   */
+  validateDay: function(value) {
+    return validate(value, 0, 6, "day");
+  },
+
+  /**
+   * 验证每月天数值范围
+   * @param {Number} range{0, 31}
+   * @return {Boolean}
+   */
+  validateDate: function(value, month, year) {
+    return validate(value, 1, Date.getMonthDays(month, year), "date");
+  },
+
+  /**
+   * 验证每年的月份数值范围
+   * @param {Number} range{0, 11}
+   * @return {Boolean}
+   */
+  validateMonth: function(value) {
+    return validate(value, 0, 11, "month");
+  },
+
+  /**
+   * 验证每年的自然月份数值范围
+   * @param {Number} range{1, 12}
+   * @return {Boolean}
+   */
+  validateNaturalMonth: function(value) {
+    return validate(value, 1, 12, "natural month");
+  },
+
+  /**
+   * 验证年份数值范围
+   * @param {Number} range{0, 9999}
+   * @return {Boolean}
+   */
+  validateYear: function(value) {
+    return validate(value, 0, 9999, "year");
+  },
+
+  /**
+   * 创建一个当天的日期对象，时间为 00:00:00 000
+   * @returns {Date}
+   */
+  today: function() {
+    var date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  },
+
+  /**
+   * 获取某年每月天数的数组
+   * @param {number} year 年份
+   * @returns {Array.<number>}
+   */
+  getDaysPerMonth: function(year) {
+    var d = perMonthDays.slice();
+    Date.isLeapYear(year) && (d[1] = 29);
+    return d;
+  },
+
+  /**
+   * 获取某年某自然月份的天数
+   * @param {number} month 月份
+   * @param {number} year 年份
+   * @returns {number} range{28, 31}
+   */
+  getMonthDays: function(month, year) {
+    return month !== 2 ? perMonthDays[month - 1] : year % 4 || !(year % 400) ? 28 : 29;
+  },
+
+  /**
+   * 获取某年某月份的天数
+   * @param {number} month 月份
+   * @param {number} year 年份
+   * @returns {number} range{28, 31}
+   */
+  getNaturalMonthDays: function(month, year) {
+    return month !== 1 ? perMonthDays[month] : year % 4 || !(year % 400) ? 28 : 29;
+  },
+
+  /**
+   * 获取某年某季度的天数
+   * @param {number} quarter 季度
+   * @param {number} year 年份
+   * @returns {number} range{90, 92}
+   */
+  getQuarterDays: function(quarter, year) {
+    return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
+  },
+
+  /**
+   * 获取某年份的天数
+   * @param {number} year 年份
+   * @returns {number} range{365,366}
+   */
+  getYearDays: function(year) {
+    return year % 4 || !(year % 400) ? 365 : 366;
+  },
+
+  /**
+   * 获取某世纪的天数
+   * @param {number} century 世纪
+   * @returns {number} range{36523,36524}
+   */
+  getCenturyDays: function(century) {
+    var days = 0,
+      startYear = (Math.abs(century) - 1) * 100;
+
+    days += (100) * 365 + parseInt(99 / 4);
+    // 若本世纪元年为闰年，再加一天
+    !(startYear % 400) && days++;
+
+    return days;
+  },
+
+  /**
+   * 获取某年份所属世纪的天数
+   * @param {number} year 年份
+   * @returns {number} range{36523,36524}
+   */
+  getCenturyDaysByYear: function(year) {
+    var century = Date.getCentury(year);
+    return Date.getCenturyDays(century);
+  },
+
+  /**
+   * 获取某年份所属的世纪数
+   * @param {number} year
+   * @returns {number}
+   */
+  getCentury: function(year) {
+    return parseInt(year / 100) + (year < 0 ? 1 : -1);
+  },
+
+  /**
+   * 判断年份是否为闰年
+   * @param {number} year 年份
+   * @returns {boolean}
+   */
+  isLeapYear: function(year) {
+    return !(year % 4 || !(year % 400));
+  },
+
+  /**
+   * 判断年份是否为平年
+   * @param {number} year 年份
+   * @returns {boolean}
+   */
+  isAverageYear: function(year) {
+    return !!(year % 4) || !(year % 400);
+  },
+
+  /**
+   * 解析格式化的日期，返回相应的日期对象
+   * @param {string} time '2012-3-13 11:11:11 111' | '2012-3-13T11:11:11.111Z' | '2012-3-13' | '3/13/2012' | ...
+   * @param {string} format  'yyyy-MM-dd hh:mm:ss SSS' | 'yyyy-MM-ddThh:mm:ss.SSSZ' |  'yyyy-MM-dd' | 'MM/dd/yyyy' | ...
+   * @returns {Date}
+   */
+  parse2Date: function(time, format) {
+    // 若为毫秒数
+    if (typeof time === 'number') {
+      return new Date(time);
+    }
+    time = String(time);
+
+    // 若能正确解析，返回该时间的毫秒数
+    // 若不能正确解析，返回NaN
+    var M = Date.parse(time);
+    if (M === M) {
+      return new Date(M);
+    }
+
+    format = format ? format.replace(rMdhms_g, function(m) {
+      return (m = m.charAt(0)) + m;
+    }) : Date.FORMAT;
+
+    time = time.replace(rDigits_g, function(m) {
+      return m.length < 2 ? '0' + m : m;
+    });
+
+    var r, m, n,
+      d = new Date,
+      a = [
+        [ry_g, "setFullYear"] //year
+        ,
+        [rM_g, "setRealMonth"] //month + 1
+        ,
+        [rd_g, "setDate"] //day
+        ,
+        [rh_g, "setHours"] //hour
+        ,
+        [rm_g, "setMinutes"] //minute
+        ,
+        [rs_g, "setSeconds"] //second
+        ,
+        [rS_g, "setMilliseconds"] //millisecond
+      ],
+      i = -1,
+      l = a.length;
+
+    while (++i < l) {
+      r = a[i][0];
+      m = a[i][1];
+      d[m](r.test(format) ? parseInt(time.slice(r.lastIndex - RegExp.lastMatch.length, r.lastIndex)) || 0 : 0);
+      r.lastIndex = 0;
+    }
+    return d;
+  },
+
+  /**
+   * 解析时段用语，返回起始和结束两个时间格式字符串的数组
+   * @param {string} period
+   * @param {string} format
+   * @returns {Array.<string>}
+   */
+  parse2DateFormatsByPeriod: function(period, format) {
+    var dates = parse2DatesByPeriod(period);
+    format || (format = Date.FORMAT);
+    return [
+      dates[0].format(format),
+      dates[1].format(format)
+    ];
+  },
+
+  /**
+   * 解析时段用语，返回起始和结束两个日期对象的数组
+   * @param {string} period
+   * @returns {Array.<Date>}
+   */
+  parse2DateObjectsByPeriod: function(period) {
+    return parse2DatesByPeriod(period);
+  },
+
+  /**
+   * 根据时区的偏移量（字符串表述）获取时区的缩写名
+   * @param {String} offset The 4-character offset string prefixed with + or - (e.g. "-0500")
+   * @returns {String} 如：UTC|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT
+   */
+  getTimezoneAbbreviation: function(offset) {
+    var CultureInfo = getCultureInfo(),
+      timezones = CultureInfo.timezones;
+    for (let i = 0, l = timezones.length; i < l; i++) {
+      if (timezones[i].offset === offset) {
+        return timezones[i].name;
+      }
+    }
+    return null;
+  },
+
+  /**
+   * 根据时区的缩写名获取时区的偏移量（字符串表述）
+   * @param {String} name 如：UTC|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT
+   * @returns {String} The 4-character offset string prefixed with + or - (e.g. "-0500")
+   */
+  getTimezoneOffset: function(name) {
+    var CultureInfo = getCultureInfo(),
+      timezones = CultureInfo.timezones;
+    for (let i = 0, l = timezones.length; i < l; i++) {
+      if (timezones[i].name === name.toUpperCase()) {
+        return timezones[i].offset;
+      }
+    }
+    return null;
+  },
+
+  FORMAT: 'yyyy-MM-dd hh:mm:ss SSS',
+  FORMAT_DATE: 'yyyy-MM-dd',
+  FORMAT_DATETIME: 'yyyy-MM-dd hh:mm:ss',
+
+  UTC_FORMAT: 'yyyy-MM-ddThh:mm:ss.SSSZ',
+
+  // Hash表：时间量词复数词对应原词
+  // 毫秒、秒、分钟、小时、天、周、月、季度、年、世纪
+  pluralClassifiers: {
+    milliseconds: "millisecond",
+    seconds: "second",
+    minutes: "minute",
+    hours: "hour",
+    days: "day",
+    weeks: "week",
+    months: "month",
+    quarters: "quarter",
+    years: "year",
+    centuries: "century"
+  },
+
+  // 匹配时段语句的正则表达式
+  rPeriod: rPeriod
+
+})

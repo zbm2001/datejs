@@ -4,7 +4,7 @@ logs
 npm-debug.log*
 
 node_modules/
-dist/
 .project
 .idea
-gulpfile.js
+rollup.config.js
+rollup.js
