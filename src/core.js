@@ -1,5 +1,5 @@
-import {typeOf, assign} from 'z-utils/src';
-import {default as i18n, getCultureInfo} from './i18n';
+import {typeOf, assign} from 'z-utils';
+import {CultureInfos, getCultureInfo} from './i18n';
 
 var ry = /y+/,
   rM = /M+/,
@@ -26,7 +26,7 @@ var ry = /y+/,
   // 每季度天数（平年）
   perQuarterDays = [90, 91, 92, 92];
 
-Date.i18n = i18n;
+export {CultureInfos, getCultureInfo}
 
 // 扩展日期类的原型方法
 assign(Date.prototype, {
@@ -35,7 +35,7 @@ assign(Date.prototype, {
    * 设置日期对象的时间为 00:00:00 000
    * @returns {number} 当前日期对象的毫秒数
    */
-  setTimeToFirst: function() {
+  setTimeToFirst () {
     return this.setHours(0, 0, 0, 0);
   },
 
@@ -43,7 +43,7 @@ assign(Date.prototype, {
    * 设置日期对象的时间为 23:59:59 999
    * @returns {number} 当前日期对象的毫秒数
    */
-  setTimeToLast: function() {
+  setTimeToLast () {
     return this.setHours(23, 59, 59, 999);
   },
 
@@ -52,7 +52,7 @@ assign(Date.prototype, {
    * @param {Date} date
    * @returns {number} 当前日期对象的毫秒数
    */
-  setTimeByDate: function(date) {
+  setTimeByDate (date) {
     return this.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
   },
 
@@ -60,7 +60,7 @@ assign(Date.prototype, {
    * 设置时间与当前日期对象的时间一致 hh:mm:ss SSS
    * @returns {number} 当前日期对象的毫秒数
    */
-  setTimeByNow: function() {
+  setTimeByNow () {
     return this.setTimeByDate(new Date());
   },
 
@@ -69,7 +69,7 @@ assign(Date.prototype, {
    * @param {Date} date
    * @returns {number} range{-1,0,1}
    */
-  compareTo: function(date) {
+  compareTo (date) {
     if (Date.isDate(date)) {
       return this < date ? -1 : this > date ? 1 : 0;
     }
@@ -81,7 +81,7 @@ assign(Date.prototype, {
    * @param {Date} date
    * @returns {Boolean}
    */
-  equals: function(date) {
+  equals (date) {
     return this.compareTo(date) === 0;
   },
 
@@ -90,7 +90,7 @@ assign(Date.prototype, {
    * @param {Date} date
    * @returns {Boolean}
    */
-  isBefore: function(date) {
+  isBefore (date) {
     return this.compareTo(date) < 0;
   },
 
@@ -99,7 +99,7 @@ assign(Date.prototype, {
    * @param {Date} date
    * @returns {Boolean}
    */
-  isAfter: function(date) {
+  isAfter (date) {
     return this.compareTo(date) > 0;
   },
 
@@ -109,7 +109,7 @@ assign(Date.prototype, {
    * @param {Date} end 结束时间
    * @returns {Boolean}
    */
-  between: function(start, end) {
+  between (start, end) {
     return this.compareTo(start) >= 0 && this.compareTo(end) <= 0;
   },
 
@@ -117,7 +117,7 @@ assign(Date.prototype, {
    * 复制一个日期对象
    * @returns {Date}
    */
-  clone: function() {
+  clone () {
     return new Date(this.getTime());
   },
 
@@ -126,7 +126,7 @@ assign(Date.prototype, {
    * @param {Number} number [Required]
    * @return {Date} this
    */
-  addMilliseconds: function(number) {
+  addMilliseconds (number) {
     this.setMilliseconds(this.getMilliseconds() + number * 1);
     return this;
   },
@@ -136,7 +136,7 @@ assign(Date.prototype, {
    * @param {Number} number [Required]
    * @return {Date} this
    */
-  addSeconds: function(number) {
+  addSeconds (number) {
     return this.addMilliseconds(number * 1000);
   },
 
@@ -145,7 +145,7 @@ assign(Date.prototype, {
    * @param {Number} number [Required]
    * @return {Date} this
    */
-  addMinutes: function(number) {
+  addMinutes (number) {
     return this.addMilliseconds(number * 60 * 1000);
   },
 
@@ -154,7 +154,7 @@ assign(Date.prototype, {
    * @param {Number} number [Required]
    * @return {Date} this
    */
-  addHours: function(number) {
+  addHours (number) {
     return this.addMilliseconds(number * 60 * 60 * 1000);
   },
 
@@ -163,7 +163,7 @@ assign(Date.prototype, {
    * @param {Number} number [Required]
    * @return {Date} this
    */
-  addDays: function(number) {
+  addDays (number) {
     this.setDate(this.getDate() + number * 1);
     return this;
   },
@@ -173,7 +173,7 @@ assign(Date.prototype, {
    * @param {Number} number [Required]
    * @return {Date} this
    */
-  addWeeks: function(number) {
+  addWeeks (number) {
     return this.addDays(number * 7);
   },
 
@@ -182,7 +182,7 @@ assign(Date.prototype, {
    * @param {Number} number [Required]
    * @return {Date} this
    */
-  addMonths: function(number) {
+  addMonths (number) {
     var n = this.getDate();
     this.setDate(1);
     this.setMonth(this.getMonth() + number * 1);
@@ -195,7 +195,7 @@ assign(Date.prototype, {
    * @param {Number} number [Required]
    * @return {Date} this
    */
-  addYears: function(number) {
+  addYears (number) {
     return this.addMonths(number * 12);
   },
 
@@ -203,7 +203,7 @@ assign(Date.prototype, {
    * 获取当月份自然数
    * @returns {number} range{1,12}
    */
-  getNaturalMonth: function() {
+  getNaturalMonth () {
     return this.getMonth() + 1;
   },
 
@@ -212,7 +212,7 @@ assign(Date.prototype, {
    * @param {number} month 月份
    * @returns {number} 当前日期对象的毫秒数
    */
-  setNaturalMonth: function(month) {
+  setNaturalMonth (month) {
     if (Date.validateNaturalMonth(month)) {
       return this.setMonth(month - 1);
     }
@@ -223,7 +223,7 @@ assign(Date.prototype, {
    * 获取当年每月天数的数组
    * @returns {Array.<number>} length{12} range{28,31}
    */
-  getDaysPerMonth: function() {
+  getDaysPerMonth () {
     var year = this.getFullYear(),
       d = perMonthDays.slice();
     (year % 4 || !(year % 400)) || (d[1] = 29);
@@ -234,7 +234,7 @@ assign(Date.prototype, {
    * 获取当年每季度天数的数组
    * @returns {Array.<number>} length{4} range{91,92}
    */
-  getDaysPerQuarter: function() {
+  getDaysPerQuarter () {
     var year = this.getFullYear(),
       d = perQuarterDays.slice();
     (year % 4 || !(year % 400)) || (d[0] = 91);
@@ -245,7 +245,7 @@ assign(Date.prototype, {
    * 获取当年当月的天数
    * @returns {number} range{28,31}
    */
-  getMonthDays: function() {
+  getMonthDays () {
     var month = this.getMonth(),
       year;
     if (month !== 1) {
@@ -259,7 +259,7 @@ assign(Date.prototype, {
    * 获取当年当季度的天数
    * @returns {number} range{91,92}
    */
-  getQuarterDays: function() {
+  getQuarterDays () {
     var quarter = this.getQuarter(),
       year;
     if (quarter !== 1) {
@@ -273,7 +273,7 @@ assign(Date.prototype, {
    * 获取当年的天数
    * @returns {number} range{365,366}
    */
-  getYearDays: function() {
+  getYearDays () {
     var year = this.getFullYear();
     return year % 4 || !(year % 400) ? 365 : 366;
   },
@@ -282,7 +282,7 @@ assign(Date.prototype, {
    * 获取当世纪的天数
    * @returns {number} range{36523,36524}
    */
-  getCenturyDays: function() {
+  getCenturyDays () {
     var days = 0,
       year = this.getFullYear(),
       startYear = parseInt(year / 100) * 100;
@@ -298,7 +298,7 @@ assign(Date.prototype, {
    * 获取当季度数
    * @returns {number} range{1,4}
    */
-  getQuarter: function() {
+  getQuarter () {
     return parseInt((this.getMonth() + 3) / 3);
   },
 
@@ -306,7 +306,7 @@ assign(Date.prototype, {
    * 获取当世纪数
    * @returns {Number}
    */
-  getCentury: function() {
+  getCentury () {
     var year = this.getFullYear();
     return parseInt(year / 100);
   },
@@ -315,7 +315,7 @@ assign(Date.prototype, {
    * 获取当季度的第多少天
    * @returns {number} range{1,92}
    */
-  getQuarterDate: function() {
+  getQuarterDate () {
     var month = this.getMonth(),
       days = month && this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function(a, b) {
         return a + b;
@@ -327,7 +327,7 @@ assign(Date.prototype, {
    * 获取当年的第多少天
    * @returns {number} range{1,366}
    */
-  getYearDate: function() {
+  getYearDate () {
     var month = this.getMonth(),
       days = month && this.getDaysPerMonth().slice(0, month).reduce(function(a, b) {
         return a + b;
@@ -339,7 +339,7 @@ assign(Date.prototype, {
    * 获取当个世纪的第多少天
    * @returns {number} range{1,36524}
    */
-  getCenturyDate: function() {
+  getCenturyDate () {
     var date = this.getYearDate(),
       year = this.getFullYear(),
       startYear = parseInt(year / 100) * 100;
@@ -355,7 +355,7 @@ assign(Date.prototype, {
    * 判断当年是否为闰年
    * @returns {boolean}
    */
-  isLeapYear: function() {
+  isLeapYear () {
     var year = this.getFullYear();
     return !(year % 4 || !(year % 400));
   },
@@ -364,7 +364,7 @@ assign(Date.prototype, {
    * 判断当年是否为平年
    * @returns {boolean}
    */
-  isAverageYear: function() {
+  isAverageYear () {
     var year = this.getFullYear();
     return !!(year % 4) || !(year % 400);
   },
@@ -374,7 +374,7 @@ assign(Date.prototype, {
    * @param {string} classifier
    * @returns {number} range{1,36524}
    */
-  getDateByClassifier: function(classifier) {
+  getDateByClassifier (classifier) {
     switch (classifier) {
       case "day":
         return 1;
@@ -398,7 +398,7 @@ assign(Date.prototype, {
    * @param {string} classifier
    * @returns {number}
    */
-  getRestDaysByClassifier: function(classifier) {
+  getRestDaysByClassifier (classifier) {
     switch (classifier) {
       case "day":
         return 0;
@@ -422,7 +422,7 @@ assign(Date.prototype, {
    * @param {string} classifier
    * @returns {number} range{1, 36524}
    */
-  getDaysByClassifier: function(classifier) {
+  getDaysByClassifier (classifier) {
     switch (classifier) {
       case "day":
         return 1;
@@ -447,7 +447,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByPastClassifiers: function(classifier, number) {
+  getDaysByPastClassifiers (classifier, number) {
     switch (classifier) {
       case "day":
         return number;
@@ -471,7 +471,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByPastMonths: function(number) {
+  getDaysByPastMonths (number) {
     var month = this.getMonth() + 1,
       year = this.getFullYear(),
       days = 0;
@@ -490,7 +490,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByPastQuarters: function(number) {
+  getDaysByPastQuarters (number) {
     var quarter = this.getQuarter(),
       year = this.getFullYear(),
       days = 0;
@@ -509,7 +509,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByPastYears: function(number) {
+  getDaysByPastYears (number) {
     var year = this.getFullYear(),
       days = 0;
     for (; number > 0; number--) {
@@ -523,7 +523,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByPastCenturies: function(number) {
+  getDaysByPastCenturies (number) {
     var century = this.getCentury(),
       days = 0;
     for (; number > 0; number--) {
@@ -538,7 +538,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByNextClassifiers: function(classifier, number) {
+  getDaysByNextClassifiers (classifier, number) {
     switch (classifier) {
       case "day":
         return number;
@@ -562,7 +562,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByNextMonths: function(number) {
+  getDaysByNextMonths (number) {
     var month = this.getMonth() + 1,
       year = this.getFullYear(),
       days = 0;
@@ -581,7 +581,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByNextQuarters: function(number) {
+  getDaysByNextQuarters (number) {
     var quarter = this.getQuarter(),
       year = this.getFullYear(),
       days = 0;
@@ -600,7 +600,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByNextYears: function(number) {
+  getDaysByNextYears (number) {
     var year = this.getFullYear(),
       days = 0;
     for (; number > 0; number--) {
@@ -614,7 +614,7 @@ assign(Date.prototype, {
    * @param {number} number
    * @returns {number}
    */
-  getDaysByNextCenturies: function(number) {
+  getDaysByNextCenturies (number) {
     var century = this.getCentury(),
       days = 0;
     for (; number > 0; number--) {
@@ -624,17 +624,17 @@ assign(Date.prototype, {
   },
 
   // 获取当年第多少周
-  getYearWeek: function() {
+  getYearWeek () {
 
   },
 
   // 获取当季第多少周
-  getQuarterWeek: function() {
+  getQuarterWeek () {
 
   },
 
   // 获取当月第多少周
-  getMonthWeek: function() {
+  getMonthWeek () {
 
   },
 
@@ -643,7 +643,7 @@ assign(Date.prototype, {
    * @param {Object} config
    * @returns {Object} this
    */
-  set: function(config) {
+  set (config) {
     if (Date.validateMillisecond(config.millisecond)) {
       this.addMilliseconds(config.millisecond - this.getMilliseconds());
     }
@@ -692,7 +692,7 @@ assign(Date.prototype, {
    * Get the offset from UTC of the current date.
    * @return {String} The 4-character offset string prefixed with + or - (e.g. "-0500")
    */
-  getUTCOffset: function() {
+  getUTCOffset () {
     var n = this.getTimezoneOffset() * -10 / 6,
       r;
     if (n < 0) {
@@ -708,7 +708,7 @@ assign(Date.prototype, {
    * Get the time zone abbreviation of the current date.
    * @return {String} The abbreviated time zone name (e.g. "EST")
    */
-  getTimezone: function() {
+  getTimezone () {
     return Date.getTimezoneAbbreviation(this.getUTCOffset());
   },
 
@@ -717,7 +717,7 @@ assign(Date.prototype, {
    * @param {string} offset
    * @return {String} The abbreviated time zone name (e.g. "EST")
    */
-  setTimezoneOffset: function(offset) {
+  setTimezoneOffset (offset) {
     // 返回协调通用时间(UTC)与当前主机时间之间的分钟差值
     // 函数的返回值为Number类型，返回当前计算机上的时间和UTC时间之间相差的分钟数。
     // 一般而言，如果当地时间早于UTC时间(在UTC时区以东，例如亚洲地区)，则返回值为负；如果当地时间晚于UTC时间(在UTC时区以西，例如美洲地区)，则返回值为正。
@@ -731,7 +731,7 @@ assign(Date.prototype, {
    * @param {string} offset
    * @return {String} The abbreviated time zone name (e.g. "EST")
    */
-  setTimezone: function(offset) {
+  setTimezone (offset) {
     return this.setTimezoneOffset(Date.getTimezoneOffset(offset));
   },
 
@@ -740,7 +740,7 @@ assign(Date.prototype, {
    * @param {string} format
    * @returns {string}
    */
-  format: function(format) {
+  format (format) {
 
     format || (format = Date.FORMAT);
 
@@ -791,7 +791,7 @@ assign(Date.prototype, {
  * @param {String} name 
  * @returns {Boolean}
  */
-function validate(n, min, max, name) {
+function validate (n, min, max, name) {
   if (n == null) {
     return false;
   }
@@ -808,7 +808,7 @@ function validate(n, min, max, name) {
  * @param {string} period
  * @returns {Array.<Date>} length{2}
  */
-function parse2DatesByPeriod(period) {
+function parse2DatesByPeriod (period) {
 
   var now = new Date(),
     start,
@@ -914,8 +914,8 @@ export default assign(Date, {
    * @param {Date} date
    * @returns {boolean}
    */
-  isDate: function(date) {
-    return typeOf(date) === '[object Date]';
+  isDate (date) {
+    return typeOf(date) === 'Date';
   },
 
 
@@ -924,7 +924,7 @@ export default assign(Date, {
    * @param {Number} range{0, 999}
    * @return {Boolean}
    */
-  validateMillisecond: function(value) {
+  validateMillisecond (value) {
     return validate(value, 0, 999, "millisecond");
   },
 
@@ -933,7 +933,7 @@ export default assign(Date, {
    * @param {Number} range{0, 59}
    * @return {Boolean}
    */
-  validateSecond: function(value) {
+  validateSecond (value) {
     return validate(value, 0, 59, "second");
   },
 
@@ -942,7 +942,7 @@ export default assign(Date, {
    * @param {Number} range{0, 59}
    * @return {Boolean}
    */
-  validateMinute: function(value) {
+  validateMinute (value) {
     return validate(value, 0, 59, "minute");
   },
 
@@ -951,7 +951,7 @@ export default assign(Date, {
    * @param {Number} range{0, 23}
    * @return {Boolean}
    */
-  validateHour: function(value) {
+  validateHour (value) {
     return validate(value, 0, 23, "hour");
   },
 
@@ -960,7 +960,7 @@ export default assign(Date, {
    * @param {Number} range{0, 6}
    * @return {Boolean}
    */
-  validateDay: function(value) {
+  validateDay (value) {
     return validate(value, 0, 6, "day");
   },
 
@@ -969,7 +969,7 @@ export default assign(Date, {
    * @param {Number} range{0, 31}
    * @return {Boolean}
    */
-  validateDate: function(value, month, year) {
+  validateDate (value, month, year) {
     return validate(value, 1, Date.getMonthDays(month, year), "date");
   },
 
@@ -978,7 +978,7 @@ export default assign(Date, {
    * @param {Number} range{0, 11}
    * @return {Boolean}
    */
-  validateMonth: function(value) {
+  validateMonth (value) {
     return validate(value, 0, 11, "month");
   },
 
@@ -987,7 +987,7 @@ export default assign(Date, {
    * @param {Number} range{1, 12}
    * @return {Boolean}
    */
-  validateNaturalMonth: function(value) {
+  validateNaturalMonth (value) {
     return validate(value, 1, 12, "natural month");
   },
 
@@ -996,7 +996,7 @@ export default assign(Date, {
    * @param {Number} range{0, 9999}
    * @return {Boolean}
    */
-  validateYear: function(value) {
+  validateYear (value) {
     return validate(value, 0, 9999, "year");
   },
 
@@ -1004,7 +1004,7 @@ export default assign(Date, {
    * 创建一个当天的日期对象，时间为 00:00:00 000
    * @returns {Date}
    */
-  today: function() {
+  today () {
     var date = new Date();
     date.setHours(0, 0, 0, 0);
     return date;
@@ -1015,7 +1015,7 @@ export default assign(Date, {
    * @param {number} year 年份
    * @returns {Array.<number>}
    */
-  getDaysPerMonth: function(year) {
+  getDaysPerMonth (year) {
     var d = perMonthDays.slice();
     Date.isLeapYear(year) && (d[1] = 29);
     return d;
@@ -1027,7 +1027,7 @@ export default assign(Date, {
    * @param {number} year 年份
    * @returns {number} range{28, 31}
    */
-  getMonthDays: function(month, year) {
+  getMonthDays (month, year) {
     return month !== 2 ? perMonthDays[month - 1] : year % 4 || !(year % 400) ? 28 : 29;
   },
 
@@ -1037,7 +1037,7 @@ export default assign(Date, {
    * @param {number} year 年份
    * @returns {number} range{28, 31}
    */
-  getNaturalMonthDays: function(month, year) {
+  getNaturalMonthDays (month, year) {
     return month !== 1 ? perMonthDays[month] : year % 4 || !(year % 400) ? 28 : 29;
   },
 
@@ -1047,7 +1047,7 @@ export default assign(Date, {
    * @param {number} year 年份
    * @returns {number} range{90, 92}
    */
-  getQuarterDays: function(quarter, year) {
+  getQuarterDays (quarter, year) {
     return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
   },
 
@@ -1056,7 +1056,7 @@ export default assign(Date, {
    * @param {number} year 年份
    * @returns {number} range{365,366}
    */
-  getYearDays: function(year) {
+  getYearDays (year) {
     return year % 4 || !(year % 400) ? 365 : 366;
   },
 
@@ -1065,7 +1065,7 @@ export default assign(Date, {
    * @param {number} century 世纪
    * @returns {number} range{36523,36524}
    */
-  getCenturyDays: function(century) {
+  getCenturyDays (century) {
     var days = 0,
       startYear = (Math.abs(century) - 1) * 100;
 
@@ -1081,7 +1081,7 @@ export default assign(Date, {
    * @param {number} year 年份
    * @returns {number} range{36523,36524}
    */
-  getCenturyDaysByYear: function(year) {
+  getCenturyDaysByYear (year) {
     var century = Date.getCentury(year);
     return Date.getCenturyDays(century);
   },
@@ -1091,7 +1091,7 @@ export default assign(Date, {
    * @param {number} year
    * @returns {number}
    */
-  getCentury: function(year) {
+  getCentury (year) {
     return parseInt(year / 100) + (year < 0 ? 1 : -1);
   },
 
@@ -1100,7 +1100,7 @@ export default assign(Date, {
    * @param {number} year 年份
    * @returns {boolean}
    */
-  isLeapYear: function(year) {
+  isLeapYear (year) {
     return !(year % 4 || !(year % 400));
   },
 
@@ -1109,8 +1109,19 @@ export default assign(Date, {
    * @param {number} year 年份
    * @returns {boolean}
    */
-  isAverageYear: function(year) {
+  isAverageYear (year) {
     return !!(year % 4) || !(year % 400);
+  },
+
+  /**
+   * 格式化日期对象、时间毫秒数、时间格式字符串表述的转换
+   * @param {Date|Number|String} time 日期对象、时间毫秒数、时间格式字符串表述
+   * @returns {String}
+   */
+  format (time, format, timeFormat) {
+    // 解析为时间对象
+    var date = Date.parse2Date(time, timeFormat);
+    return date.format(format);
   },
 
   /**
@@ -1119,11 +1130,16 @@ export default assign(Date, {
    * @param {string} format  'yyyy-MM-dd hh:mm:ss SSS' | 'yyyy-MM-ddThh:mm:ss.SSSZ' |  'yyyy-MM-dd' | 'MM/dd/yyyy' | ...
    * @returns {Date}
    */
-  parse2Date: function(time, format) {
-    // 若为毫秒数
-    if (typeof time === 'number') {
-      return new Date(time);
+  parse2Date (time, format) {
+    switch (typeOf(time)) {
+        // 若为毫秒数
+      case 'Number':
+        return new Date(time);
+        // 若为日期对象
+      case 'Date':
+        return time.format(format);
     }
+    // 统一作转化为字符串处理
     time = String(time);
 
     // 若能正确解析，返回该时间的毫秒数
@@ -1176,7 +1192,7 @@ export default assign(Date, {
    * @param {string} format
    * @returns {Array.<string>}
    */
-  parse2DateFormatsByPeriod: function(period, format) {
+  parse2DateFormatsByPeriod (period, format) {
     var dates = parse2DatesByPeriod(period);
     format || (format = Date.FORMAT);
     return [
@@ -1190,7 +1206,7 @@ export default assign(Date, {
    * @param {string} period
    * @returns {Array.<Date>}
    */
-  parse2DateObjectsByPeriod: function(period) {
+  parse2DateObjectsByPeriod (period) {
     return parse2DatesByPeriod(period);
   },
 
@@ -1199,7 +1215,7 @@ export default assign(Date, {
    * @param {String} offset The 4-character offset string prefixed with + or - (e.g. "-0500")
    * @returns {String} 如：UTC|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT
    */
-  getTimezoneAbbreviation: function(offset) {
+  getTimezoneAbbreviation (offset) {
     var CultureInfo = getCultureInfo(),
       timezones = CultureInfo.timezones;
     for (let i = 0, l = timezones.length; i < l; i++) {
@@ -1215,7 +1231,7 @@ export default assign(Date, {
    * @param {String} name 如：UTC|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT
    * @returns {String} The 4-character offset string prefixed with + or - (e.g. "-0500")
    */
-  getTimezoneOffset: function(name) {
+  getTimezoneOffset (name) {
     var CultureInfo = getCultureInfo(),
       timezones = CultureInfo.timezones;
     for (let i = 0, l = timezones.length; i < l; i++) {
@@ -1248,6 +1264,9 @@ export default assign(Date, {
   },
 
   // 匹配时段语句的正则表达式
-  rPeriod: rPeriod
+  rPeriod: rPeriod,
+
+  CultureInfos,
+  getCultureInfo,
 
 })

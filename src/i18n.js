@@ -1,12 +1,12 @@
-import CultureInfo_0 from './i18n/en-US'
-import CultureInfo_1 from './i18n/zh-CN'
+import en_US from './i18n/en-US'
+import zh_CN from './i18n/zh-CN'
 
-const CultureInfos = [CultureInfo_0, CultureInfo_1]
+const CultureInfos = [en_US, zh_CN]
 
-function getCultureInfo() {
-  let cultureName = typeof navigator === 'object' ? navigator.language || 'en-US' : 'en-US'
+function getCultureInfo (culture) {
+  culture || (culture = typeof navigator === 'object' ? navigator.language || 'en-US' : 'en-US')
   for (let i = 0, l = CultureInfos.length; i < l; i++) {
-    if (CultureInfos[i].name === cultureName) {
+    if (CultureInfos[i].name === culture) {
       return CultureInfos[i]
     }
   }
@@ -16,9 +16,4 @@ function getCultureInfo() {
 export {
 	CultureInfos,
 	getCultureInfo
-}
-
-export default {
-  CultureInfos,
-  getCultureInfo
 }
