@@ -1162,7 +1162,7 @@ export default assign(Date, {
       a = [
         [ry_g, "setFullYear"] //year
         ,
-        [rM_g, "setRealMonth"] //month + 1
+        [rM_g, "setNaturalMonth"] //month + 1
         ,
         [rd_g, "setDate"] //day
         ,
