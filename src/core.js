@@ -2,34 +2,35 @@ import {typeOf, assign} from 'z-utils';
 import {CultureInfos, getCultureInfo} from './i18n';
 
 var ry = /y+/,
-  rM = /M+/,
-  rd = /d+/,
-  rh = /h+/,
-  rm = /m+/,
-  rs = /s+/,
-  rS = /S+/,
+    rM = /M+/,
+    rd = /d+/,
+    rh = /h+/,
+    rm = /m+/,
+    rs = /s+/,
+    rS = /S+/,
 
-  ry_g = /y+/g,
-  rM_g = /M+/g,
-  rd_g = /d+/g,
-  rh_g = /h+/g,
-  rm_g = /m+/g,
-  rs_g = /s+/g,
-  rS_g = /S+/g,
+    ry_g = /y+/g,
+    rM_g = /M+/g,
+    rd_g = /d+/g,
+    rh_g = /h+/g,
+    rm_g = /m+/g,
+    rs_g = /s+/g,
+    rS_g = /S+/g,
 
-  rMdhms_g = /[Mdhms]+/g,
-  rDigits_g = /\d+/g,
-  rPeriod = /^(this|last|past|next)\s*([0-9]*)\s*(days?|weeks?|months?|quarters?|years?|century|centuries)$/i,
+    rMdhms_g = /[Mdhms]+/g,
+    rDigits_g = /\d+/g,
+    rPeriod = /^(this|last|past|next)\s*([0-9]*)\s*(days?|weeks?|months?|quarters?|years?|century|centuries)$/i,
 
-  // 每月天数（平年）
-  perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-  // 每季度天数（平年）
-  perQuarterDays = [90, 91, 92, 92];
+    // 每月天数（平年）
+    perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+    // 每季度天数（平年）
+    perQuarterDays = [90, 91, 92, 92],
+    DP = Date.prototype;
 
 export {CultureInfos, getCultureInfo}
 
 // 扩展日期类的原型方法
-assign(Date.prototype, {
+assign(DP, {
 
   /**
    * 设置日期对象的时间为 00:00:00 000
@@ -225,7 +226,7 @@ assign(Date.prototype, {
    */
   getDaysPerMonth () {
     var year = this.getFullYear(),
-      d = perMonthDays.slice();
+        d = perMonthDays.slice();
     (year % 4 || !(year % 400)) || (d[1] = 29);
     return d;
   },
@@ -236,7 +237,7 @@ assign(Date.prototype, {
    */
   getDaysPerQuarter () {
     var year = this.getFullYear(),
-      d = perQuarterDays.slice();
+        d = perQuarterDays.slice();
     (year % 4 || !(year % 400)) || (d[0] = 91);
     return d;
   },
@@ -247,7 +248,7 @@ assign(Date.prototype, {
    */
   getMonthDays () {
     var month = this.getMonth(),
-      year;
+        year;
     if (month !== 1) {
       return perMonthDays[month];
     }
@@ -261,7 +262,7 @@ assign(Date.prototype, {
    */
   getQuarterDays () {
     var quarter = this.getQuarter(),
-      year;
+        year;
     if (quarter !== 1) {
       return perQuarterDays[quarter - 1];
     }
@@ -284,8 +285,8 @@ assign(Date.prototype, {
    */
   getCenturyDays () {
     var days = 0,
-      year = this.getFullYear(),
-      startYear = parseInt(year / 100) * 100;
+        year = this.getFullYear(),
+        startYear = parseInt(year / 100) * 100;
 
     days += 100 * 365 + parseInt(99 / 4);
     // 若本世纪元年为闰年，再加一天
@@ -312,42 +313,56 @@ assign(Date.prototype, {
   },
 
   /**
-   * 获取当季度的第多少天
+   * 获取当季度的第多少天 getQuarterOrdinalDay
    * @returns {number} range{1,92}
    */
   getQuarterDate () {
     var month = this.getMonth(),
-      days = month && this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function(a, b) {
-        return a + b;
-      }, 0);
+        days = month && this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function (a, b) {
+              return a + b;
+            }, 0);
     return days + this.getDate();
   },
 
   /**
-   * 获取当年的第多少天
+   * 获取当年的第多少天 getYearOrdinalDay
    * @returns {number} range{1,366}
    */
   getYearDate () {
     var month = this.getMonth(),
-      days = month && this.getDaysPerMonth().slice(0, month).reduce(function(a, b) {
-        return a + b;
-      }, 0);
+        days = month && this.getDaysPerMonth().slice(0, month).reduce(function (a, b) {
+              return a + b;
+            }, 0);
     return days + this.getDate();
   },
 
   /**
-   * 获取当个世纪的第多少天
+   * 获取当个世纪的第多少天 getCenturyOrdinalDay
    * @returns {number} range{1,36524}
    */
   getCenturyDate () {
     var date = this.getYearDate(),
-      year = this.getFullYear(),
-      startYear = parseInt(year / 100) * 100;
+        year = this.getFullYear(),
+        startYear = parseInt(year / 100) * 100;
 
     date += (year - startYear - 1) * 365 + parseInt((year - startYear) / 4);
     // 若本世纪元年为闰年，再加一天
     !(startYear % 400) && date++;
 
+    return date;
+  },
+
+  /**
+   * 获取公元的第多少天 Anno Domini(A.D.) getADOrdinalDay
+   * @returns {number} range{1,36524}
+   */
+  getADDate () {
+    var year = this.getFullYear(),
+        date = year * 365 + this.getYearDate();
+
+    for(; --year > -1;) {
+      year % 4 || year % 400 && date++
+    }
     return date;
   },
 
@@ -473,8 +488,8 @@ assign(Date.prototype, {
    */
   getDaysByPastMonths (number) {
     var month = this.getMonth() + 1,
-      year = this.getFullYear(),
-      days = 0;
+        year = this.getFullYear(),
+        days = 0;
     for (; number > 0; number--) {
       if (--month < 1) {
         month = 12;
@@ -492,8 +507,8 @@ assign(Date.prototype, {
    */
   getDaysByPastQuarters (number) {
     var quarter = this.getQuarter(),
-      year = this.getFullYear(),
-      days = 0;
+        year = this.getFullYear(),
+        days = 0;
     for (; number > 0; number--) {
       if (--quarter < 1) {
         quarter = 4;
@@ -511,7 +526,7 @@ assign(Date.prototype, {
    */
   getDaysByPastYears (number) {
     var year = this.getFullYear(),
-      days = 0;
+        days = 0;
     for (; number > 0; number--) {
       days += Date.getYearDays(--year);
     }
@@ -525,7 +540,7 @@ assign(Date.prototype, {
    */
   getDaysByPastCenturies (number) {
     var century = this.getCentury(),
-      days = 0;
+        days = 0;
     for (; number > 0; number--) {
       days += Date.getCenturyDays(--century);
     }
@@ -564,8 +579,8 @@ assign(Date.prototype, {
    */
   getDaysByNextMonths (number) {
     var month = this.getMonth() + 1,
-      year = this.getFullYear(),
-      days = 0;
+        year = this.getFullYear(),
+        days = 0;
     for (; number > 0; number--) {
       if (++month > 12) {
         month = 1;
@@ -583,8 +598,8 @@ assign(Date.prototype, {
    */
   getDaysByNextQuarters (number) {
     var quarter = this.getQuarter(),
-      year = this.getFullYear(),
-      days = 0;
+        year = this.getFullYear(),
+        days = 0;
     for (; number > 0; number--) {
       if (++quarter > 4) {
         quarter = 1;
@@ -602,7 +617,7 @@ assign(Date.prototype, {
    */
   getDaysByNextYears (number) {
     var year = this.getFullYear(),
-      days = 0;
+        days = 0;
     for (; number > 0; number--) {
       days += Date.getYearDays(++year);
     }
@@ -616,7 +631,7 @@ assign(Date.prototype, {
    */
   getDaysByNextCenturies (number) {
     var century = this.getCentury(),
-      days = 0;
+        days = 0;
     for (; number > 0; number--) {
       days += Date.getCenturyDays(++century);
     }
@@ -694,7 +709,7 @@ assign(Date.prototype, {
    */
   getUTCOffset () {
     var n = this.getTimezoneOffset() * -10 / 6,
-      r;
+        r;
     if (n < 0) {
       r = (n - 10000).toString();
       return r.charAt(0) + r.substr(2);
@@ -722,7 +737,7 @@ assign(Date.prototype, {
     // 函数的返回值为Number类型，返回当前计算机上的时间和UTC时间之间相差的分钟数。
     // 一般而言，如果当地时间早于UTC时间(在UTC时区以东，例如亚洲地区)，则返回值为负；如果当地时间晚于UTC时间(在UTC时区以西，例如美洲地区)，则返回值为正。
     var here = this.getTimezoneOffset(),
-      there = Number(offset) * -6 / 10;
+        there = Number(offset) * -6 / 10;
     return this.addMinutes(there - here);
   },
 
@@ -745,36 +760,36 @@ assign(Date.prototype, {
     format || (format = Date.FORMAT);
 
     var date = this,
-      a = [
-        //[ry, "getFullYear"] //year
-        [rM, "getNaturalMonth"], //month + 1
-        [rd, "getDate"], //day
-        [rh, "getHours"], //hour
-        [rm, "getMinutes"], //minute
-        [rs, "getSeconds"] //second
-        //,[rS, "getMilliseconds"] //millisecond
-        //,["q", "getQuarter"]  //quarter
-      ],
-      i = 0,
-      l = a.length;
+        a = [
+          //[ry, "getFullYear"] //year
+          [rM, "getNaturalMonth"], //month + 1
+          [rd, "getDate"], //day
+          [rh, "getHours"], //hour
+          [rm, "getMinutes"], //minute
+          [rs, "getSeconds"] //second
+          //,[rS, "getMilliseconds"] //millisecond
+          //,["q", "getQuarter"]  //quarter
+        ],
+        i = 0,
+        l = a.length;
 
-    format = format.replace(ry, function(m) {
+    format = format.replace(ry, function (m) {
       return (date.getFullYear() + '').substr(-m.length);
     });
 
     for (; i < l; i++) {
-      format = format.replace(a[i][0], function(m) {
+      format = format.replace(a[i][0], function (m) {
         var p = date[a[i][1]]();
         return (p > 9 || m.length < 2 ? '' : '0') + p;
       });
     }
 
-    format = format.replace(rS, function(m) {
+    format = format.replace(rS, function (m) {
       var S = date.getMilliseconds();
       return (S > 99 || m.length < 3 ? '' : '0') + S;
     });
 
-    format = format.replace('q', function(m) {
+    format = format.replace('q', function (m) {
       return parseInt((date.getMonth() + 3) / 3);
     });
 
@@ -788,7 +803,7 @@ assign(Date.prototype, {
  * @param {Number} n 需要验证数值
  * @param {Number} min 指定数值范围的最小值
  * @param {Number} max 指定数值范围的最大值
- * @param {String} name 
+ * @param {String} name
  * @returns {Boolean}
  */
 function validate (n, min, max, name) {
@@ -811,15 +826,15 @@ function validate (n, min, max, name) {
 function parse2DatesByPeriod (period) {
 
   var now = new Date(),
-    start,
-    start0 = new Date(),
-    end,
-    end2 = new Date(),
-    diffStartDays = 0,
-    diffEndDays = 0,
-    classifier,
-    classifierPlural,
-    thisClassifierDays;
+      start,
+      start0 = new Date(),
+      end,
+      end2 = new Date(),
+      diffStartDays = 0,
+      diffEndDays = 0,
+      classifier,
+      classifierPlural,
+      thisClassifierDays;
 
   // 设置开始时间为那天的 0 时计起
   start0.setTimeToFirst();
@@ -876,7 +891,7 @@ function parse2DatesByPeriod (period) {
         if (classifier = Date.pluralClassifiers[classifierPlural]) {
 
           switch (RegExp.$1) {
-            // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
+              // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
             case 'last':
               diffStartDays = -now.getDaysByPastClassifiers(classifier, number) + 1;
               break;
@@ -905,6 +920,13 @@ function parse2DatesByPeriod (period) {
 
   return [start, end];
 }
+
+assign(DP, {
+  getQuarterOrdinalDay: DP.getQuarterDate,
+  getYearOrdinalDay: DP.getQuarterDate,
+  getCenturyOrdinalDay: DP.getQuarterDate,
+  getADOrdinalDay: DP.getQuarterDate
+})
 
 // 扩展静态方法
 export default assign(Date, {
@@ -1067,7 +1089,7 @@ export default assign(Date, {
    */
   getCenturyDays (century) {
     var days = 0,
-      startYear = (Math.abs(century) - 1) * 100;
+        startYear = (Math.abs(century) - 1) * 100;
 
     days += (100) * 365 + parseInt(99 / 4);
     // 若本世纪元年为闰年，再加一天
@@ -1149,33 +1171,33 @@ export default assign(Date, {
       return new Date(M);
     }
 
-    format = format ? format.replace(rMdhms_g, function(m) {
-      return (m = m.charAt(0)) + m;
-    }) : Date.FORMAT;
+    format = format ? format.replace(rMdhms_g, function (m) {
+          return (m = m.charAt(0)) + m;
+        }) : Date.FORMAT;
 
-    time = time.replace(rDigits_g, function(m) {
+    time = time.replace(rDigits_g, function (m) {
       return m.length < 2 ? '0' + m : m;
     });
 
     var r, m, n,
-      d = new Date,
-      a = [
-        [ry_g, "setFullYear"] //year
-        ,
-        [rM_g, "setNaturalMonth"] //month + 1
-        ,
-        [rd_g, "setDate"] //day
-        ,
-        [rh_g, "setHours"] //hour
-        ,
-        [rm_g, "setMinutes"] //minute
-        ,
-        [rs_g, "setSeconds"] //second
-        ,
-        [rS_g, "setMilliseconds"] //millisecond
-      ],
-      i = -1,
-      l = a.length;
+        d = new Date,
+        a = [
+          [ry_g, "setFullYear"] //year
+          ,
+          [rM_g, "setNaturalMonth"] //month + 1
+          ,
+          [rd_g, "setDate"] //day
+          ,
+          [rh_g, "setHours"] //hour
+          ,
+          [rm_g, "setMinutes"] //minute
+          ,
+          [rs_g, "setSeconds"] //second
+          ,
+          [rS_g, "setMilliseconds"] //millisecond
+        ],
+        i = -1,
+        l = a.length;
 
     while (++i < l) {
       r = a[i][0];
@@ -1217,7 +1239,7 @@ export default assign(Date, {
    */
   getTimezoneAbbreviation (offset) {
     var CultureInfo = getCultureInfo(),
-      timezones = CultureInfo.timezones;
+        timezones = CultureInfo.timezones;
     for (let i = 0, l = timezones.length; i < l; i++) {
       if (timezones[i].offset === offset) {
         return timezones[i].name;
@@ -1233,7 +1255,7 @@ export default assign(Date, {
    */
   getTimezoneOffset (name) {
     var CultureInfo = getCultureInfo(),
-      timezones = CultureInfo.timezones;
+        timezones = CultureInfo.timezones;
     for (let i = 0, l = timezones.length; i < l; i++) {
       if (timezones[i].name === name.toUpperCase()) {
         return timezones[i].offset;
