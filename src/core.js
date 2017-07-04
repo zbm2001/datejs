@@ -923,9 +923,9 @@ function parse2DatesByPeriod (period) {
 
 assign(DP, {
   getQuarterOrdinalDay: DP.getQuarterDate,
-  getYearOrdinalDay: DP.getQuarterDate,
-  getCenturyOrdinalDay: DP.getQuarterDate,
-  getADOrdinalDay: DP.getQuarterDate
+  getYearOrdinalDay: DP.getYearDate,
+  getCenturyOrdinalDay: DP.getCenturyDate,
+  getADOrdinalDay: DP.getADDate
 })
 
 // 扩展静态方法
