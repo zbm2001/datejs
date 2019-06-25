@@ -7,20 +7,31 @@ const commonjs = require('rollup-plugin-commonjs')
 const replace = require('rollup-plugin-replace')
 const pkg = require('./package.json')
 const banner = '/*\n' +
-    'name,version,description,author,license'.split(',')
-        .map((k) => ` * @${k}: ${pkg[k]}`).join('\n') +
-    '\n */'
-const external = Object.keys(pkg.devDependencies)
+  'name,version,description,author,license'.split(',')
+    .map((k) => ` * @${k}: ${pkg[k]}`).join('\n') +
+  '\n */\n'
+const external = Object.keys(pkg.dependencies || {}).concat(Object.keys(pkg.devDependencies))
+// 清除 npm 私有模块前缀，如：@scope/module-name => module-name
+const filename = pkg.name.replace(/^@\S+\//, '')
+// 变量名做驼峰标记法转换，如：module-name => moduleName
+const name = filename.replace(/-([a-z])/g, (m, $1) => $1.toUpperCase())
 
 module.exports = {
-  entry: 'src/index.js',
+  input: 'src/index.js',
   plugins: [
-    // resolve({
-    //   jsnext: true,
-    //   main: true,
-    //   browser: true,
-    // }),
-    // commonjs(),
+    resolve({
+      jsnext: true,
+      main: true,
+      browser: true,
+    }),
+    commonjs({
+      // namedExports: {
+      //   // left-hand side can be an absolute path, a path
+      //   // relative to the current directory, or the name
+      //   // of a module in node_modules
+      //   'node_modules/my-lib/index.js': [ 'named' ]
+      // }
+    }),
     // babel 遵循 es2015+ 标准，但执行较慢
     // babel({
     //   exclude: 'node_modules/**'
@@ -35,30 +46,32 @@ module.exports = {
     })
   ],
   external: external,
-  targets: [
+  output: [
     {
-      dest: 'index.js',
+      banner,
+      name,
+      file: 'index.js',
       format: 'cjs'
-    }/*, {
-     dest: 'date.amd.js',
-     format: 'amd'
-     }, {
-     dest: 'date.cjs.js',
-     format: 'cjs'
-     }, {
-     dest: 'date.es.js',
-     format: 'es'
-     }, {
-     dest: 'date.iife.js',
-     format: 'iife'
-     }, {
-     dest: 'date.umd.js',
-     format: 'umd'
-     }*/
-  ],
-  banner: banner,
-  // format: 'iife', // cjs amd es6 umd iife
-  moduleName: 'date', // umd 或 iife 模式下，若入口文件含 export，必须加上该属性
-  // dest: 'date.js', // 输出文件
-  // sourceMap: false   // 调试编译
+    }, {
+      banner,
+      name,
+      file: filename + '.amd.js',
+      format: 'amd'
+    }, {
+      banner,
+      name,
+      file: filename + '.es.js',
+      format: 'es'
+    }, {
+      banner,
+      name,
+      file: filename + '.iife.js',
+      format: 'iife'
+    }, {
+      banner,
+      name,
+      file: filename + '.umd.js',
+      format: 'umd'
+    }
+  ]
 }

@@ -1,7 +1,6 @@
-import {typeOf, assign} from 'z-utils';
-import {CultureInfos, getCultureInfo} from './i18n';
+import {CultureInfos, getCultureInfo} from './i18n'
 
-var ry = /y+/,
+const ry = /y+/,
     rM = /M+/,
     rd = /d+/,
     rh = /h+/,
@@ -19,25 +18,26 @@ var ry = /y+/,
 
     rMdhms_g = /[Mdhms]+/g,
     rDigits_g = /\d+/g,
-    rPeriod = /^(this|last|past|next)\s*([0-9]*)\s*(days?|weeks?|months?|quarters?|years?|century|centuries)$/i,
+    regexPeriod = /^(this|last|past|next)\s*([0-9]*)\s*(days?|weeks?|months?|quarters?|years?|century|centuries)$/i,
 
     // 每月天数（平年）
     perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
     // 每季度天数（平年）
     perQuarterDays = [90, 91, 92, 92],
-    DP = Date.prototype;
+    DP = Date.prototype,
+    typeOf = (toString => object => toString.call(object).slice(8, -1))(Object.prototype.toString)
 
 export {CultureInfos, getCultureInfo}
 
 // 扩展日期类的原型方法
-assign(DP, {
+Object.assign(DP, {
 
   /**
    * 设置日期对象的时间为 00:00:00 000
    * @returns {number} 当前日期对象的毫秒数
    */
   setTimeToFirst () {
-    return this.setHours(0, 0, 0, 0);
+    return this.setHours(0, 0, 0, 0)
   },
 
   /**
@@ -45,7 +45,7 @@ assign(DP, {
    * @returns {number} 当前日期对象的毫秒数
    */
   setTimeToLast () {
-    return this.setHours(23, 59, 59, 999);
+    return this.setHours(23, 59, 59, 999)
   },
 
   /**
@@ -54,7 +54,7 @@ assign(DP, {
    * @returns {number} 当前日期对象的毫秒数
    */
   setTimeByDate (date) {
-    return this.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+    return this.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds())
   },
 
   /**
@@ -62,7 +62,7 @@ assign(DP, {
    * @returns {number} 当前日期对象的毫秒数
    */
   setTimeByNow () {
-    return this.setTimeByDate(new Date());
+    return this.setTimeByDate(new Date())
   },
 
   /**
@@ -72,9 +72,9 @@ assign(DP, {
    */
   compareTo (date) {
     if (Date.isDate(date)) {
-      return this < date ? -1 : this > date ? 1 : 0;
+      return this < date ? -1 : this > date ? 1 : 0
     }
-    throw new TypeError(date + " is not a Date object");
+    throw new TypeError(date + " is not a Date object")
   },
 
   /**
@@ -83,7 +83,7 @@ assign(DP, {
    * @returns {Boolean}
    */
   equals (date) {
-    return this.compareTo(date) === 0;
+    return this.compareTo(date) === 0
   },
 
   /**
@@ -92,7 +92,7 @@ assign(DP, {
    * @returns {Boolean}
    */
   isBefore (date) {
-    return this.compareTo(date) < 0;
+    return this.compareTo(date) < 0
   },
 
   /**
@@ -101,7 +101,7 @@ assign(DP, {
    * @returns {Boolean}
    */
   isAfter (date) {
-    return this.compareTo(date) > 0;
+    return this.compareTo(date) > 0
   },
 
   /**
@@ -111,7 +111,7 @@ assign(DP, {
    * @returns {Boolean}
    */
   between (start, end) {
-    return this.compareTo(start) >= 0 && this.compareTo(end) <= 0;
+    return this.compareTo(start) >= 0 && this.compareTo(end) <= 0
   },
 
   /**
@@ -119,7 +119,7 @@ assign(DP, {
    * @returns {Date}
    */
   clone () {
-    return new Date(this.getTime());
+    return new Date(this.getTime())
   },
 
   /**
@@ -128,8 +128,8 @@ assign(DP, {
    * @return {Date} this
    */
   addMilliseconds (number) {
-    this.setMilliseconds(this.getMilliseconds() + number * 1);
-    return this;
+    this.setMilliseconds(this.getMilliseconds() + number * 1)
+    return this
   },
 
   /**
@@ -138,7 +138,7 @@ assign(DP, {
    * @return {Date} this
    */
   addSeconds (number) {
-    return this.addMilliseconds(number * 1000);
+    return this.addMilliseconds(number * 1000)
   },
 
   /**
@@ -147,7 +147,7 @@ assign(DP, {
    * @return {Date} this
    */
   addMinutes (number) {
-    return this.addMilliseconds(number * 60 * 1000);
+    return this.addMilliseconds(number * 60 * 1000)
   },
 
   /**
@@ -156,7 +156,7 @@ assign(DP, {
    * @return {Date} this
    */
   addHours (number) {
-    return this.addMilliseconds(number * 60 * 60 * 1000);
+    return this.addMilliseconds(number * 60 * 60 * 1000)
   },
 
   /**
@@ -165,8 +165,8 @@ assign(DP, {
    * @return {Date} this
    */
   addDays (number) {
-    this.setDate(this.getDate() + number * 1);
-    return this;
+    this.setDate(this.getDate() + number * 1)
+    return this
   },
 
   /**
@@ -175,7 +175,7 @@ assign(DP, {
    * @return {Date} this
    */
   addWeeks (number) {
-    return this.addDays(number * 7);
+    return this.addDays(number * 7)
   },
 
   /**
@@ -184,11 +184,11 @@ assign(DP, {
    * @return {Date} this
    */
   addMonths (number) {
-    var n = this.getDate();
-    this.setDate(1);
-    this.setMonth(this.getMonth() + number * 1);
-    this.setDate(Math.min(n, this.getMonthDays()));
-    return this;
+    var n = this.getDate()
+    this.setDate(1)
+    this.setMonth(this.getMonth() + number * 1)
+    this.setDate(Math.min(n, this.getMonthDays()))
+    return this.getTime()
   },
 
   /**
@@ -197,7 +197,7 @@ assign(DP, {
    * @return {Date} this
    */
   addYears (number) {
-    return this.addMonths(number * 12);
+    return this.addMonths(number * 12)
   },
 
   /**
@@ -205,7 +205,7 @@ assign(DP, {
    * @returns {number} range{1,12}
    */
   getNaturalMonth () {
-    return this.getMonth() + 1;
+    return this.getMonth() + 1
   },
 
   /**
@@ -215,9 +215,9 @@ assign(DP, {
    */
   setNaturalMonth (month) {
     if (Date.validateNaturalMonth(month)) {
-      return this.setMonth(month - 1);
+      return this.setMonth(month - 1)
     }
-    this.getTime();
+    return this.getTime()
   },
 
   /**
@@ -226,9 +226,9 @@ assign(DP, {
    */
   getDaysPerMonth () {
     var year = this.getFullYear(),
-        d = perMonthDays.slice();
-    (year % 4 || !(year % 400)) || (d[1] = 29);
-    return d;
+        d = perMonthDays.slice()
+    (year % 4 || !(year % 400)) || (d[1] = 29)
+    return d
   },
 
   /**
@@ -237,9 +237,9 @@ assign(DP, {
    */
   getDaysPerQuarter () {
     var year = this.getFullYear(),
-        d = perQuarterDays.slice();
-    (year % 4 || !(year % 400)) || (d[0] = 91);
-    return d;
+        d = perQuarterDays.slice()
+    (year % 4 || !(year % 400)) || (d[0] = 91)
+    return d
   },
 
   /**
@@ -248,12 +248,12 @@ assign(DP, {
    */
   getMonthDays () {
     var month = this.getMonth(),
-        year;
+        year
     if (month !== 1) {
-      return perMonthDays[month];
+      return perMonthDays[month]
     }
-    year = this.getFullYear();
-    return year % 4 || !(year % 400) ? 28 : 29;
+    year = this.getFullYear()
+    return year % 4 || !(year % 400) ? 28 : 29
   },
 
   /**
@@ -262,12 +262,12 @@ assign(DP, {
    */
   getQuarterDays () {
     var quarter = this.getQuarter(),
-        year;
+        year
     if (quarter !== 1) {
-      return perQuarterDays[quarter - 1];
+      return perQuarterDays[quarter - 1]
     }
-    year = this.getFullYear();
-    return year % 4 || !(year % 400) ? 90 : 91;
+    year = this.getFullYear()
+    return year % 4 || !(year % 400) ? 90 : 91
   },
 
   /**
@@ -275,8 +275,8 @@ assign(DP, {
    * @returns {number} range{365,366}
    */
   getYearDays () {
-    var year = this.getFullYear();
-    return year % 4 || !(year % 400) ? 365 : 366;
+    var year = this.getFullYear()
+    return year % 4 || !(year % 400) ? 365 : 366
   },
 
   /**
@@ -286,13 +286,13 @@ assign(DP, {
   getCenturyDays () {
     var days = 0,
         year = this.getFullYear(),
-        startYear = parseInt(year / 100) * 100;
+        startYear = parseInt(year / 100) * 100
 
-    days += 100 * 365 + parseInt(99 / 4);
+    days += 100 * 365 + parseInt(99 / 4)
     // 若本世纪元年为闰年，再加一天
-    !(startYear % 400) && days++;
+    !(startYear % 400) && days++
 
-    return days;
+    return days
   },
 
   /**
@@ -300,7 +300,7 @@ assign(DP, {
    * @returns {number} range{1,4}
    */
   getQuarter () {
-    return parseInt((this.getMonth() + 3) / 3);
+    return parseInt((this.getMonth() + 3) / 3)
   },
 
   /**
@@ -308,8 +308,8 @@ assign(DP, {
    * @returns {Number}
    */
   getCentury () {
-    var year = this.getFullYear();
-    return parseInt(year / 100);
+    var year = this.getFullYear()
+    return parseInt(year / 100)
   },
 
   /**
@@ -319,9 +319,9 @@ assign(DP, {
   getQuarterDate () {
     var month = this.getMonth(),
         days = month && this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function (a, b) {
-              return a + b;
-            }, 0);
-    return days + this.getDate();
+              return a + b
+            }, 0)
+    return days + this.getDate()
   },
 
   /**
@@ -331,9 +331,9 @@ assign(DP, {
   getYearDate () {
     var month = this.getMonth(),
         days = month && this.getDaysPerMonth().slice(0, month).reduce(function (a, b) {
-              return a + b;
-            }, 0);
-    return days + this.getDate();
+              return a + b
+            }, 0)
+    return days + this.getDate()
   },
 
   /**
@@ -343,13 +343,13 @@ assign(DP, {
   getCenturyDate () {
     var date = this.getYearDate(),
         year = this.getFullYear(),
-        startYear = parseInt(year / 100) * 100;
+        startYear = parseInt(year / 100) * 100
 
-    date += (year - startYear - 1) * 365 + parseInt((year - startYear) / 4);
+    date += (year - startYear - 1) * 365 + parseInt((year - startYear) / 4)
     // 若本世纪元年为闰年，再加一天
-    !(startYear % 400) && date++;
+    !(startYear % 400) && date++
 
-    return date;
+    return date
   },
 
   /**
@@ -358,12 +358,12 @@ assign(DP, {
    */
   getADDate () {
     var year = this.getFullYear(),
-        date = year * 365 + this.getYearDate();
+        date = year * 365 + this.getYearDate()
 
     for(; --year > -1;) {
       year % 4 || year % 400 && date++
     }
-    return date;
+    return date
   },
 
   /**
@@ -371,8 +371,8 @@ assign(DP, {
    * @returns {boolean}
    */
   isLeapYear () {
-    var year = this.getFullYear();
-    return !(year % 4 || !(year % 400));
+    var year = this.getFullYear()
+    return !(year % 4 || !(year % 400))
   },
 
   /**
@@ -380,8 +380,8 @@ assign(DP, {
    * @returns {boolean}
    */
   isAverageYear () {
-    var year = this.getFullYear();
-    return !!(year % 4) || !(year % 400);
+    var year = this.getFullYear()
+    return !!(year % 4) || !(year % 400)
   },
 
   /**
@@ -392,19 +392,19 @@ assign(DP, {
   getDateByClassifier (classifier) {
     switch (classifier) {
       case "day":
-        return 1;
+        return 1
       case "week":
-        return this.getDay();
+        return this.getDay()
       case "month":
-        return this.getDate();
+        return this.getDate()
       case "quarter":
-        return this.getQuarterDate();
+        return this.getQuarterDate()
       case "year":
-        return this.getYearDate();
+        return this.getYearDate()
       case "century":
-        return this.getCenturyDate();
+        return this.getCenturyDate()
       default:
-        return 1;
+        return 1
     }
   },
 
@@ -416,19 +416,19 @@ assign(DP, {
   getRestDaysByClassifier (classifier) {
     switch (classifier) {
       case "day":
-        return 0;
+        return 0
       case "week":
-        return 6 - this.getDay();
+        return 6 - this.getDay()
       case "month":
-        return this.getMonthDays() - this.getDate();
+        return this.getMonthDays() - this.getDate()
       case "quarter":
-        return this.getQuarterDays() - this.getQuarterDate();
+        return this.getQuarterDays() - this.getQuarterDate()
       case "year":
-        return this.getYearDays() - this.getYearDate();
+        return this.getYearDays() - this.getYearDate()
       case "century":
-        return this.getCenturyDays() - this.getCenturyDate();
+        return this.getCenturyDays() - this.getCenturyDate()
       default:
-        return 0;
+        return 0
     }
   },
 
@@ -440,19 +440,19 @@ assign(DP, {
   getDaysByClassifier (classifier) {
     switch (classifier) {
       case "day":
-        return 1;
+        return 1
       case "week":
-        return 7;
+        return 7
       case "month":
-        return this.getMonthDays();
+        return this.getMonthDays()
       case "quarter":
-        return this.getQuarterDays();
+        return this.getQuarterDays()
       case "year":
-        return this.getYearDays();
+        return this.getYearDays()
       case "century":
-        return this.getCenturyDays();
+        return this.getCenturyDays()
       default:
-        return 1;
+        return 1
     }
   },
 
@@ -465,19 +465,19 @@ assign(DP, {
   getDaysByPastClassifiers (classifier, number) {
     switch (classifier) {
       case "day":
-        return number;
+        return number
       case "week":
-        return 7 * number;
+        return 7 * number
       case "month":
-        return this.getDaysByPastMonths(number);
+        return this.getDaysByPastMonths(number)
       case "quarter":
-        return this.getDaysByPastQuarters(number);
+        return this.getDaysByPastQuarters(number)
       case "year":
-        return this.getDaysByPastYears(number);
+        return this.getDaysByPastYears(number)
       case "century":
-        return this.getDaysByPastCenturies(number);
+        return this.getDaysByPastCenturies(number)
       default:
-        return number;
+        return number
     }
   },
 
@@ -489,15 +489,15 @@ assign(DP, {
   getDaysByPastMonths (number) {
     var month = this.getMonth() + 1,
         year = this.getFullYear(),
-        days = 0;
+        days = 0
     for (; number > 0; number--) {
       if (--month < 1) {
-        month = 12;
-        year--;
+        month = 12
+        year--
       }
-      days += Date.getMonthDays(month, year);
+      days += Date.getMonthDays(month, year)
     }
-    return days;
+    return days
   },
 
   /**
@@ -508,15 +508,15 @@ assign(DP, {
   getDaysByPastQuarters (number) {
     var quarter = this.getQuarter(),
         year = this.getFullYear(),
-        days = 0;
+        days = 0
     for (; number > 0; number--) {
       if (--quarter < 1) {
-        quarter = 4;
-        year--;
+        quarter = 4
+        year--
       }
-      days += Date.getQuarterDays(quarter, year);
+      days += Date.getQuarterDays(quarter, year)
     }
-    return days;
+    return days
   },
 
   /**
@@ -526,11 +526,11 @@ assign(DP, {
    */
   getDaysByPastYears (number) {
     var year = this.getFullYear(),
-        days = 0;
+        days = 0
     for (; number > 0; number--) {
-      days += Date.getYearDays(--year);
+      days += Date.getYearDays(--year)
     }
-    return days;
+    return days
   },
 
   /**
@@ -540,11 +540,11 @@ assign(DP, {
    */
   getDaysByPastCenturies (number) {
     var century = this.getCentury(),
-        days = 0;
+        days = 0
     for (; number > 0; number--) {
-      days += Date.getCenturyDays(--century);
+      days += Date.getCenturyDays(--century)
     }
-    return days;
+    return days
   },
 
   /**
@@ -556,19 +556,19 @@ assign(DP, {
   getDaysByNextClassifiers (classifier, number) {
     switch (classifier) {
       case "day":
-        return number;
+        return number
       case "week":
-        return 7 * number;
+        return 7 * number
       case "month":
-        return this.getDaysByNextMonths(number);
+        return this.getDaysByNextMonths(number)
       case "quarter":
-        return this.getDaysByNextQuarters(number);
+        return this.getDaysByNextQuarters(number)
       case "year":
-        return this.getDaysByNextYears(number);
+        return this.getDaysByNextYears(number)
       case "century":
-        return this.getDaysByNextCenturies(number);
+        return this.getDaysByNextCenturies(number)
       default:
-        return number;
+        return number
     }
   },
 
@@ -580,15 +580,15 @@ assign(DP, {
   getDaysByNextMonths (number) {
     var month = this.getMonth() + 1,
         year = this.getFullYear(),
-        days = 0;
+        days = 0
     for (; number > 0; number--) {
       if (++month > 12) {
-        month = 1;
-        year++;
+        month = 1
+        year++
       }
-      days += Date.getMonthDays(month, year);
+      days += Date.getMonthDays(month, year)
     }
-    return days;
+    return days
   },
 
   /**
@@ -599,15 +599,15 @@ assign(DP, {
   getDaysByNextQuarters (number) {
     var quarter = this.getQuarter(),
         year = this.getFullYear(),
-        days = 0;
+        days = 0
     for (; number > 0; number--) {
       if (++quarter > 4) {
-        quarter = 1;
-        year++;
+        quarter = 1
+        year++
       }
-      days += Date.getQuarterDays(quarter, year);
+      days += Date.getQuarterDays(quarter, year)
     }
-    return days;
+    return days
   },
 
   /**
@@ -617,11 +617,11 @@ assign(DP, {
    */
   getDaysByNextYears (number) {
     var year = this.getFullYear(),
-        days = 0;
+        days = 0
     for (; number > 0; number--) {
-      days += Date.getYearDays(++year);
+      days += Date.getYearDays(++year)
     }
-    return days;
+    return days
   },
 
   /**
@@ -631,11 +631,11 @@ assign(DP, {
    */
   getDaysByNextCenturies (number) {
     var century = this.getCentury(),
-        days = 0;
+        days = 0
     for (; number > 0; number--) {
-      days += Date.getCenturyDays(++century);
+      days += Date.getCenturyDays(++century)
     }
-    return days;
+    return days
   },
 
   // 获取当年第多少周
@@ -660,47 +660,47 @@ assign(DP, {
    */
   set (config) {
     if (Date.validateMillisecond(config.millisecond)) {
-      this.addMilliseconds(config.millisecond - this.getMilliseconds());
+      this.addMilliseconds(config.millisecond - this.getMilliseconds())
     }
 
     if (Date.validateSecond(config.second)) {
-      this.addSeconds(config.second - this.getSeconds());
+      this.addSeconds(config.second - this.getSeconds())
     }
 
     if (Date.validateMinute(config.minute)) {
-      this.addMinutes(config.minute - this.getMinutes());
+      this.addMinutes(config.minute - this.getMinutes())
     }
 
     if (Date.validateHour(config.hour)) {
-      this.addHours(config.hour - this.getHours());
+      this.addHours(config.hour - this.getHours())
     }
 
     if (Date.validateMonth(config.month)) {
-      this.addMonths(config.month - this.getMonth());
+      this.addMonths(config.month - this.getMonth())
     }
 
     if (Date.validateYear(config.year)) {
-      this.addYears(config.year - this.getFullYear());
+      this.addYears(config.year - this.getFullYear())
     }
 
     /* day has to go last because you can't validate the day without first knowing the month */
     if (Date.validateDay(config.day, this.getMonth(), this.getFullYear())) {
-      this.addDays(config.day - this.getDate());
+      this.addDays(config.day - this.getDate())
     }
 
     if (config.timezone) {
-      this.setTimezone(config.timezone);
+      this.setTimezone(config.timezone)
     }
 
     if (config.timezoneOffset) {
-      this.setTimezoneOffset(config.timezoneOffset);
+      this.setTimezoneOffset(config.timezoneOffset)
     }
 
     if (config.week && validate(config.week, 0, 53, "week")) {
-      this.setWeek(config.week);
+      this.setWeek(config.week)
     }
 
-    return this;
+    return this
   },
 
   /**
@@ -709,13 +709,13 @@ assign(DP, {
    */
   getUTCOffset () {
     var n = this.getTimezoneOffset() * -10 / 6,
-        r;
+        r
     if (n < 0) {
-      r = (n - 10000).toString();
-      return r.charAt(0) + r.substr(2);
+      r = (n - 10000).toString()
+      return r.charAt(0) + r.substr(2)
     } else {
-      r = (n + 10000).toString();
-      return "+" + r.substr(1);
+      r = (n + 10000).toString()
+      return "+" + r.substr(1)
     }
   },
 
@@ -724,7 +724,7 @@ assign(DP, {
    * @return {String} The abbreviated time zone name (e.g. "EST")
    */
   getTimezone () {
-    return Date.getTimezoneAbbreviation(this.getUTCOffset());
+    return Date.getTimezoneAbbreviation(this.getUTCOffset())
   },
 
   /**
@@ -737,8 +737,8 @@ assign(DP, {
     // 函数的返回值为Number类型，返回当前计算机上的时间和UTC时间之间相差的分钟数。
     // 一般而言，如果当地时间早于UTC时间(在UTC时区以东，例如亚洲地区)，则返回值为负；如果当地时间晚于UTC时间(在UTC时区以西，例如美洲地区)，则返回值为正。
     var here = this.getTimezoneOffset(),
-        there = Number(offset) * -6 / 10;
-    return this.addMinutes(there - here);
+        there = Number(offset) * -6 / 10
+    return this.addMinutes(there - here)
   },
 
   /**
@@ -747,7 +747,7 @@ assign(DP, {
    * @return {String} The abbreviated time zone name (e.g. "EST")
    */
   setTimezone (offset) {
-    return this.setTimezoneOffset(Date.getTimezoneOffset(offset));
+    return this.setTimezoneOffset(Date.getTimezoneOffset(offset))
   },
 
   /**
@@ -757,7 +757,7 @@ assign(DP, {
    */
   format (format) {
 
-    format || (format = Date.FORMAT);
+    format || (format = Date.FORMAT)
 
     var date = this,
         a = [
@@ -771,32 +771,32 @@ assign(DP, {
           //,["q", "getQuarter"]  //quarter
         ],
         i = 0,
-        l = a.length;
+        l = a.length
 
     format = format.replace(ry, function (m) {
-      return (date.getFullYear() + '').substr(-m.length);
-    });
+      return (date.getFullYear() + '').substr(-m.length)
+    })
 
     for (; i < l; i++) {
       format = format.replace(a[i][0], function (m) {
-        var p = date[a[i][1]]();
-        return (p > 9 || m.length < 2 ? '' : '0') + p;
-      });
+        var p = date[a[i][1]]()
+        return (p > 9 || m.length < 2 ? '' : '0') + p
+      })
     }
 
     format = format.replace(rS, function (m) {
-      var S = date.getMilliseconds();
-      return (S > 99 || m.length < 3 ? '' : '0') + S;
-    });
+      var S = date.getMilliseconds()
+      return (S > 99 || m.length < 3 ? '' : '0') + S
+    })
 
     format = format.replace('q', function (m) {
-      return parseInt((date.getMonth() + 3) / 3);
-    });
+      return parseInt((date.getMonth() + 3) / 3)
+    })
 
-    return format;
+    return format
   }
 
-});
+})
 
 /**
  * 验证与时间相关数值合法性
@@ -808,14 +808,14 @@ assign(DP, {
  */
 function validate (n, min, max, name) {
   if (n == null) {
-    return false;
+    return false
   }
   if (typeof n != "number") {
-    throw new TypeError(n + " is not a Number.");
+    throw new TypeError(n + " is not a Number.")
   } else if (n < min || n > max) {
-    throw new RangeError(n + " is not a valid value for " + name + ".");
+    throw new RangeError(n + " is not a valid value for " + name + ".")
   }
-  return true;
+  return true
 }
 
 /**
@@ -834,94 +834,94 @@ function parse2DatesByPeriod (period) {
       diffEndDays = 0,
       classifier,
       classifierPlural,
-      thisClassifierDays;
+      thisClassifierDays
 
   // 设置开始时间为那天的 0 时计起
-  start0.setTimeToFirst();
-  start = start0;
+  start0.setTimeToFirst()
+  start = start0
   // 设置结束时间为那天的最后一毫秒截止
-  end2.setTimeToLast();
-  end = end2;
+  end2.setTimeToLast()
+  end = end2
 
   switch (period) {
     case 'today': // 今天
-      diffStartDays = 0;
-      break;
+      diffStartDays = 0
+      break
     case 'yesterday': // 昨天
-      diffStartDays = -1;
-      diffEndDays = -1;
-      break;
+      diffStartDays = -1
+      diffEndDays = -1
+      break
     case 'thisWeek': // 本周
-      diffStartDays = 1 - start.getDay();
-      break;
+      diffStartDays = 1 - start.getDay()
+      break
     case 'lastWeek': // 上周
-      diffEndDays = -end.getDay();
-      diffStartDays = diffEndDays + 1 - 7;
-      break;
+      diffEndDays = -end.getDay()
+      diffStartDays = diffEndDays + 1 - 7
+      break
     case 'thisMonth': // 本月
-      diffStartDays = 1 - start.getDate();
-      break;
+      diffStartDays = 1 - start.getDate()
+      break
     case 'lastMonth': // 上月
-      diffEndDays = -end.getDate();
-      now.setDate(0);
-      diffStartDays = diffEndDays + 1 - now.getMonthDays();
-      break;
+      diffEndDays = -end.getDate()
+      now.setDate(0)
+      diffStartDays = diffEndDays + 1 - now.getMonthDays()
+      break
     case 'thisQuarter': // 本季度
-      diffStartDays = 1 - start.getQuarterDate();
-      break;
+      diffStartDays = 1 - start.getQuarterDate()
+      break
     case 'lastQuarter': // 上季度
-      diffEndDays = -end.getQuarterDate();
-      now.setDate(diffEndDays + now.getDate());
-      diffStartDays = diffEndDays + 1 - now.getQuarterDays();
-      break;
+      diffEndDays = -end.getQuarterDate()
+      now.setDate(diffEndDays + now.getDate())
+      diffStartDays = diffEndDays + 1 - now.getQuarterDays()
+      break
     case 'thisYear': // 本年
-      diffStartDays = 1 - start.getYearDate();
-      break;
+      diffStartDays = 1 - start.getYearDate()
+      break
     case 'lastYear': // 上年
-      diffEndDays = -end.getYearDate();
-      now.setFullYear(now.getFullYear() - 1);
-      diffStartDays = diffEndDays + 1 - now.getYearDays();
-      break;
+      diffEndDays = -end.getYearDate()
+      now.setFullYear(now.getFullYear() - 1)
+      diffStartDays = diffEndDays + 1 - now.getYearDays()
+      break
     default:
       // last7days, last30days, last90days, last365days...
       // last5months, last3Quarter, last2years, last1centuries...
       // past10days, past4months...
-      if (rPeriod.test(period) && (number = parseInt(RegExp.$2)) > 0) {
-        classifierPlural = RegExp.$3;
+      if (regexPeriod.test(period) && (number = parseInt(RegExp.$2)) > 0) {
+        classifierPlural = RegExp.$3
         if (classifier = Date.pluralClassifiers[classifierPlural]) {
 
           switch (RegExp.$1) {
               // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
             case 'last':
-              diffStartDays = -now.getDaysByPastClassifiers(classifier, number) + 1;
-              break;
+              diffStartDays = -now.getDaysByPastClassifiers(classifier, number) + 1
+              break
               // past 表示过去的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
             case 'past':
-              diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
-              thisClassifierDays = now.getDateByClassifier(classifier, number);
-              diffStartDays -= thisClassifierDays - 1;
-              diffEndDays -= thisClassifierDays;
-              break;
+              diffStartDays = -now.getDaysByPastClassifiers(classifier, number)
+              thisClassifierDays = now.getDateByClassifier(classifier, number)
+              diffStartDays -= thisClassifierDays - 1
+              diffEndDays -= thisClassifierDays
+              break
               // past 表示将来的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
             case 'next':
-              diffEndDays = now.getDaysByNextClassifiers(classifier, number);
-              thisClassifierDays = now.getRestDaysByClassifier(classifier, number);
-              diffStartDays += thisClassifierDays + 1;
-              diffEndDays += thisClassifierDays;
-              break;
+              diffEndDays = now.getDaysByNextClassifiers(classifier, number)
+              thisClassifierDays = now.getRestDaysByClassifier(classifier, number)
+              diffStartDays += thisClassifierDays + 1
+              diffEndDays += thisClassifierDays
+              break
             default:
           }
         }
       }
-      throw new Error('Unknown time period definition: ' + period);
+      throw new Error('Unknown time period definition: ' + period)
   }
-  start.setDate(start.getDate() + diffStartDays);
-  end.setDate(end.getDate() + diffEndDays);
+  start.setDate(start.getDate() + diffStartDays)
+  end.setDate(end.getDate() + diffEndDays)
 
-  return [start, end];
+  return [start, end]
 }
 
-assign(DP, {
+Object.assign(DP, {
   getQuarterOrdinalDay: DP.getQuarterDate,
   getYearOrdinalDay: DP.getYearDate,
   getCenturyOrdinalDay: DP.getCenturyDate,
@@ -929,7 +929,7 @@ assign(DP, {
 })
 
 // 扩展静态方法
-export default assign(Date, {
+export default Object.assign(Date, {
 
   /**
    * 判断是否为日期对象
@@ -937,7 +937,7 @@ export default assign(Date, {
    * @returns {boolean}
    */
   isDate (date) {
-    return typeOf(date) === 'Date';
+    return typeOf(date) === 'Date'
   },
 
 
@@ -947,7 +947,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateMillisecond (value) {
-    return validate(value, 0, 999, "millisecond");
+    return validate(value, 0, 999, "millisecond")
   },
 
   /**
@@ -956,7 +956,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateSecond (value) {
-    return validate(value, 0, 59, "second");
+    return validate(value, 0, 59, "second")
   },
 
   /**
@@ -965,7 +965,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateMinute (value) {
-    return validate(value, 0, 59, "minute");
+    return validate(value, 0, 59, "minute")
   },
 
   /**
@@ -974,7 +974,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateHour (value) {
-    return validate(value, 0, 23, "hour");
+    return validate(value, 0, 23, "hour")
   },
 
   /**
@@ -983,7 +983,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateDay (value) {
-    return validate(value, 0, 6, "day");
+    return validate(value, 0, 6, "day")
   },
 
   /**
@@ -992,7 +992,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateDate (value, month, year) {
-    return validate(value, 1, Date.getMonthDays(month, year), "date");
+    return validate(value, 1, Date.getMonthDays(month, year), "date")
   },
 
   /**
@@ -1001,7 +1001,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateMonth (value) {
-    return validate(value, 0, 11, "month");
+    return validate(value, 0, 11, "month")
   },
 
   /**
@@ -1010,7 +1010,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateNaturalMonth (value) {
-    return validate(value, 1, 12, "natural month");
+    return validate(value, 1, 12, "natural month")
   },
 
   /**
@@ -1019,7 +1019,7 @@ export default assign(Date, {
    * @return {Boolean}
    */
   validateYear (value) {
-    return validate(value, 0, 9999, "year");
+    return validate(value, 0, 9999, "year")
   },
 
   /**
@@ -1027,9 +1027,9 @@ export default assign(Date, {
    * @returns {Date}
    */
   today () {
-    var date = new Date();
-    date.setHours(0, 0, 0, 0);
-    return date;
+    var date = new Date()
+    date.setHours(0, 0, 0, 0)
+    return date
   },
 
   /**
@@ -1038,9 +1038,9 @@ export default assign(Date, {
    * @returns {Array.<number>}
    */
   getDaysPerMonth (year) {
-    var d = perMonthDays.slice();
-    Date.isLeapYear(year) && (d[1] = 29);
-    return d;
+    var d = perMonthDays.slice()
+    Date.isLeapYear(year) && (d[1] = 29)
+    return d
   },
 
   /**
@@ -1050,7 +1050,7 @@ export default assign(Date, {
    * @returns {number} range{28, 31}
    */
   getMonthDays (month, year) {
-    return month !== 2 ? perMonthDays[month - 1] : year % 4 || !(year % 400) ? 28 : 29;
+    return month !== 2 ? perMonthDays[month - 1] : year % 4 || !(year % 400) ? 28 : 29
   },
 
   /**
@@ -1060,7 +1060,7 @@ export default assign(Date, {
    * @returns {number} range{28, 31}
    */
   getNaturalMonthDays (month, year) {
-    return month !== 1 ? perMonthDays[month] : year % 4 || !(year % 400) ? 28 : 29;
+    return month !== 1 ? perMonthDays[month] : year % 4 || !(year % 400) ? 28 : 29
   },
 
   /**
@@ -1070,7 +1070,7 @@ export default assign(Date, {
    * @returns {number} range{90, 92}
    */
   getQuarterDays (quarter, year) {
-    return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
+    return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91
   },
 
   /**
@@ -1079,7 +1079,7 @@ export default assign(Date, {
    * @returns {number} range{365,366}
    */
   getYearDays (year) {
-    return year % 4 || !(year % 400) ? 365 : 366;
+    return year % 4 || !(year % 400) ? 365 : 366
   },
 
   /**
@@ -1089,13 +1089,13 @@ export default assign(Date, {
    */
   getCenturyDays (century) {
     var days = 0,
-        startYear = (Math.abs(century) - 1) * 100;
+        startYear = (Math.abs(century) - 1) * 100
 
-    days += (100) * 365 + parseInt(99 / 4);
+    days += (100) * 365 + parseInt(99 / 4)
     // 若本世纪元年为闰年，再加一天
-    !(startYear % 400) && days++;
+    !(startYear % 400) && days++
 
-    return days;
+    return days
   },
 
   /**
@@ -1104,8 +1104,8 @@ export default assign(Date, {
    * @returns {number} range{36523,36524}
    */
   getCenturyDaysByYear (year) {
-    var century = Date.getCentury(year);
-    return Date.getCenturyDays(century);
+    var century = Date.getCentury(year)
+    return Date.getCenturyDays(century)
   },
 
   /**
@@ -1114,7 +1114,7 @@ export default assign(Date, {
    * @returns {number}
    */
   getCentury (year) {
-    return parseInt(year / 100) + (year < 0 ? 1 : -1);
+    return parseInt(year / 100) + (year < 0 ? 1 : -1)
   },
 
   /**
@@ -1123,7 +1123,7 @@ export default assign(Date, {
    * @returns {boolean}
    */
   isLeapYear (year) {
-    return !(year % 4 || !(year % 400));
+    return !(year % 4 || !(year % 400))
   },
 
   /**
@@ -1132,7 +1132,7 @@ export default assign(Date, {
    * @returns {boolean}
    */
   isAverageYear (year) {
-    return !!(year % 4) || !(year % 400);
+    return !!(year % 4) || !(year % 400)
   },
 
   /**
@@ -1142,8 +1142,8 @@ export default assign(Date, {
    */
   format (time, format, timeFormat) {
     // 解析为时间对象
-    var date = Date.parse2Date(time, timeFormat);
-    return date.format(format);
+    var date = Date.parse2Date(time, timeFormat)
+    return date.format(format)
   },
 
   /**
@@ -1153,31 +1153,41 @@ export default assign(Date, {
    * @returns {Date}
    */
   parse2Date (time, format) {
+    if (time == null) {
+      console.warn(`${time} can not parse to date! use 0`)
+      return new Date(0)
+    }
     switch (typeOf(time)) {
         // 若为毫秒数
       case 'Number':
-        return new Date(time);
+        return new Date(time)
         // 若为日期对象
       case 'Date':
-        return time.format(format);
+        return time.format(format)
+      // 若为字符串
+      case 'String':
+        // 若全为数字
+        if (!/\D/.test(time)) return new Date(time)
+        break
+      default:
+        // 其他统一作转化为字符串处理
+        time = String(time)
     }
-    // 统一作转化为字符串处理
-    time = String(time);
 
     // 若能正确解析，返回该时间的毫秒数
     // 若不能正确解析，返回NaN
-    var M = Date.parse(time);
+    var M = Date.parse(time)
     if (M === M) {
-      return new Date(M);
+      return new Date(M)
     }
 
     format = format ? format.replace(rMdhms_g, function (m) {
-          return (m = m.charAt(0)) + m;
-        }) : Date.FORMAT;
+          return (m = m.charAt(0)) + m
+        }) : Date.FORMAT
 
     time = time.replace(rDigits_g, function (m) {
-      return m.length < 2 ? '0' + m : m;
-    });
+      return m.length < 2 ? '0' + m : m
+    })
 
     var r, m, n,
         d = new Date,
@@ -1197,15 +1207,15 @@ export default assign(Date, {
           [rS_g, "setMilliseconds"] //millisecond
         ],
         i = -1,
-        l = a.length;
+        l = a.length
 
     while (++i < l) {
-      r = a[i][0];
-      m = a[i][1];
-      d[m](r.test(format) ? parseInt(time.slice(r.lastIndex - RegExp.lastMatch.length, r.lastIndex)) || 0 : 0);
-      r.lastIndex = 0;
+      r = a[i][0]
+      m = a[i][1]
+      d[m](r.test(format) ? parseInt(time.slice(r.lastIndex - RegExp.lastMatch.length, r.lastIndex)) || 0 : 0)
+      r.lastIndex = 0
     }
-    return d;
+    return d
   },
 
   /**
@@ -1215,12 +1225,12 @@ export default assign(Date, {
    * @returns {Array.<string>}
    */
   parse2DateFormatsByPeriod (period, format) {
-    var dates = parse2DatesByPeriod(period);
-    format || (format = Date.FORMAT);
+    var dates = parse2DatesByPeriod(period)
+    format || (format = Date.FORMAT)
     return [
       dates[0].format(format),
       dates[1].format(format)
-    ];
+    ]
   },
 
   /**
@@ -1229,7 +1239,7 @@ export default assign(Date, {
    * @returns {Array.<Date>}
    */
   parse2DateObjectsByPeriod (period) {
-    return parse2DatesByPeriod(period);
+    return parse2DatesByPeriod(period)
   },
 
   /**
@@ -1239,13 +1249,13 @@ export default assign(Date, {
    */
   getTimezoneAbbreviation (offset) {
     var CultureInfo = getCultureInfo(),
-        timezones = CultureInfo.timezones;
+        timezones = CultureInfo.timezones
     for (let i = 0, l = timezones.length; i < l; i++) {
       if (timezones[i].offset === offset) {
-        return timezones[i].name;
+        return timezones[i].name
       }
     }
-    return null;
+    return null
   },
 
   /**
@@ -1255,13 +1265,13 @@ export default assign(Date, {
    */
   getTimezoneOffset (name) {
     var CultureInfo = getCultureInfo(),
-        timezones = CultureInfo.timezones;
+        timezones = CultureInfo.timezones
     for (let i = 0, l = timezones.length; i < l; i++) {
       if (timezones[i].name === name.toUpperCase()) {
-        return timezones[i].offset;
+        return timezones[i].offset
       }
     }
-    return null;
+    return null
   },
 
   FORMAT: 'yyyy-MM-dd hh:mm:ss SSS',
@@ -1286,7 +1296,7 @@ export default assign(Date, {
   },
 
   // 匹配时段语句的正则表达式
-  rPeriod: rPeriod,
+  regexPeriod,
 
   CultureInfos,
   getCultureInfo,

@@ -1,8 +1,14 @@
+/*
+ * @name: z-date
+ * @version: 1.3.2
+ * @description: javascript Date Object extend
+ * @author: zbm2001@aliyun.com
+ * @license: Apache 2.0
+ */
+
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
-
-var zUtils = require('z-utils');
 
 var en_US = {
   /* Culture Name */
@@ -427,7 +433,7 @@ var zh_CN = {
 var CultureInfos = [en_US, zh_CN];
 
 function getCultureInfo (culture) {
-  culture || (culture = typeof navigator === 'object' ? navigator.language || 'en-US' : 'en-US');
+  culture || (culture = typeof navigator === 'object' && navigator.language || 'en-US');
   for (var i = 0, l = CultureInfos.length; i < l; i++) {
     if (CultureInfos[i].name === culture) {
       return CultureInfos[i]
@@ -436,36 +442,42 @@ function getCultureInfo (culture) {
   return null
 }
 
-var ry = /y+/;
-var rM = /M+/;
-var rd = /d+/;
-var rh = /h+/;
-var rm = /m+/;
-var rs = /s+/;
-var rS = /S+/;
-var ry_g = /y+/g;
-var rM_g = /M+/g;
-var rd_g = /d+/g;
-var rh_g = /h+/g;
-var rm_g = /m+/g;
-var rs_g = /s+/g;
-var rS_g = /S+/g;
-var rMdhms_g = /[Mdhms]+/g;
-var rDigits_g = /\d+/g;
-var rPeriod = /^(this|last|past|next)\s*([0-9]*)\s*(days?|weeks?|months?|quarters?|years?|century|centuries)$/i;
-var perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-var perQuarterDays = [90, 91, 92, 92];
-var DP = Date.prototype;
+var ry = /y+/,
+    rM = /M+/,
+    rd = /d+/,
+    rh = /h+/,
+    rm = /m+/,
+    rs = /s+/,
+    rS = /S+/,
+
+    ry_g = /y+/g,
+    rM_g = /M+/g,
+    rd_g = /d+/g,
+    rh_g = /h+/g,
+    rm_g = /m+/g,
+    rs_g = /s+/g,
+    rS_g = /S+/g,
+
+    rMdhms_g = /[Mdhms]+/g,
+    rDigits_g = /\d+/g,
+    regexPeriod = /^(this|last|past|next)\s*([0-9]*)\s*(days?|weeks?|months?|quarters?|years?|century|centuries)$/i,
+
+    // 每月天数（平年）
+    perMonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+    // 每季度天数（平年）
+    perQuarterDays = [90, 91, 92, 92],
+    DP = Date.prototype,
+    typeOf = (function (toString) { return function (object) { return toString.call(object).slice(8, -1); }; })(Object.prototype.toString);
 
 // 扩展日期类的原型方法
-zUtils.assign(DP, {
+Object.assign(DP, {
 
   /**
    * 设置日期对象的时间为 00:00:00 000
    * @returns {number} 当前日期对象的毫秒数
    */
   setTimeToFirst: function setTimeToFirst () {
-    return this.setHours(0, 0, 0, 0);
+    return this.setHours(0, 0, 0, 0)
   },
 
   /**
@@ -473,7 +485,7 @@ zUtils.assign(DP, {
    * @returns {number} 当前日期对象的毫秒数
    */
   setTimeToLast: function setTimeToLast () {
-    return this.setHours(23, 59, 59, 999);
+    return this.setHours(23, 59, 59, 999)
   },
 
   /**
@@ -482,7 +494,7 @@ zUtils.assign(DP, {
    * @returns {number} 当前日期对象的毫秒数
    */
   setTimeByDate: function setTimeByDate (date) {
-    return this.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+    return this.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds())
   },
 
   /**
@@ -490,7 +502,7 @@ zUtils.assign(DP, {
    * @returns {number} 当前日期对象的毫秒数
    */
   setTimeByNow: function setTimeByNow () {
-    return this.setTimeByDate(new Date());
+    return this.setTimeByDate(new Date())
   },
 
   /**
@@ -500,9 +512,9 @@ zUtils.assign(DP, {
    */
   compareTo: function compareTo (date) {
     if (Date.isDate(date)) {
-      return this < date ? -1 : this > date ? 1 : 0;
+      return this < date ? -1 : this > date ? 1 : 0
     }
-    throw new TypeError(date + " is not a Date object");
+    throw new TypeError(date + " is not a Date object")
   },
 
   /**
@@ -511,7 +523,7 @@ zUtils.assign(DP, {
    * @returns {Boolean}
    */
   equals: function equals (date) {
-    return this.compareTo(date) === 0;
+    return this.compareTo(date) === 0
   },
 
   /**
@@ -520,7 +532,7 @@ zUtils.assign(DP, {
    * @returns {Boolean}
    */
   isBefore: function isBefore (date) {
-    return this.compareTo(date) < 0;
+    return this.compareTo(date) < 0
   },
 
   /**
@@ -529,7 +541,7 @@ zUtils.assign(DP, {
    * @returns {Boolean}
    */
   isAfter: function isAfter (date) {
-    return this.compareTo(date) > 0;
+    return this.compareTo(date) > 0
   },
 
   /**
@@ -539,7 +551,7 @@ zUtils.assign(DP, {
    * @returns {Boolean}
    */
   between: function between (start, end) {
-    return this.compareTo(start) >= 0 && this.compareTo(end) <= 0;
+    return this.compareTo(start) >= 0 && this.compareTo(end) <= 0
   },
 
   /**
@@ -547,7 +559,7 @@ zUtils.assign(DP, {
    * @returns {Date}
    */
   clone: function clone () {
-    return new Date(this.getTime());
+    return new Date(this.getTime())
   },
 
   /**
@@ -557,7 +569,7 @@ zUtils.assign(DP, {
    */
   addMilliseconds: function addMilliseconds (number) {
     this.setMilliseconds(this.getMilliseconds() + number * 1);
-    return this;
+    return this
   },
 
   /**
@@ -566,7 +578,7 @@ zUtils.assign(DP, {
    * @return {Date} this
    */
   addSeconds: function addSeconds (number) {
-    return this.addMilliseconds(number * 1000);
+    return this.addMilliseconds(number * 1000)
   },
 
   /**
@@ -575,7 +587,7 @@ zUtils.assign(DP, {
    * @return {Date} this
    */
   addMinutes: function addMinutes (number) {
-    return this.addMilliseconds(number * 60 * 1000);
+    return this.addMilliseconds(number * 60 * 1000)
   },
 
   /**
@@ -584,7 +596,7 @@ zUtils.assign(DP, {
    * @return {Date} this
    */
   addHours: function addHours (number) {
-    return this.addMilliseconds(number * 60 * 60 * 1000);
+    return this.addMilliseconds(number * 60 * 60 * 1000)
   },
 
   /**
@@ -594,7 +606,7 @@ zUtils.assign(DP, {
    */
   addDays: function addDays (number) {
     this.setDate(this.getDate() + number * 1);
-    return this;
+    return this
   },
 
   /**
@@ -603,7 +615,7 @@ zUtils.assign(DP, {
    * @return {Date} this
    */
   addWeeks: function addWeeks (number) {
-    return this.addDays(number * 7);
+    return this.addDays(number * 7)
   },
 
   /**
@@ -616,7 +628,7 @@ zUtils.assign(DP, {
     this.setDate(1);
     this.setMonth(this.getMonth() + number * 1);
     this.setDate(Math.min(n, this.getMonthDays()));
-    return this;
+    return this.getTime()
   },
 
   /**
@@ -625,7 +637,7 @@ zUtils.assign(DP, {
    * @return {Date} this
    */
   addYears: function addYears (number) {
-    return this.addMonths(number * 12);
+    return this.addMonths(number * 12)
   },
 
   /**
@@ -633,7 +645,7 @@ zUtils.assign(DP, {
    * @returns {number} range{1,12}
    */
   getNaturalMonth: function getNaturalMonth () {
-    return this.getMonth() + 1;
+    return this.getMonth() + 1
   },
 
   /**
@@ -643,9 +655,9 @@ zUtils.assign(DP, {
    */
   setNaturalMonth: function setNaturalMonth (month) {
     if (Date.validateNaturalMonth(month)) {
-      return this.setMonth(month - 1);
+      return this.setMonth(month - 1)
     }
-    this.getTime();
+    return this.getTime()
   },
 
   /**
@@ -654,9 +666,9 @@ zUtils.assign(DP, {
    */
   getDaysPerMonth: function getDaysPerMonth () {
     var year = this.getFullYear(),
-        d = perMonthDays.slice();
+        d = perMonthDays.slice()
     (year % 4 || !(year % 400)) || (d[1] = 29);
-    return d;
+    return d
   },
 
   /**
@@ -665,9 +677,9 @@ zUtils.assign(DP, {
    */
   getDaysPerQuarter: function getDaysPerQuarter () {
     var year = this.getFullYear(),
-        d = perQuarterDays.slice();
+        d = perQuarterDays.slice()
     (year % 4 || !(year % 400)) || (d[0] = 91);
-    return d;
+    return d
   },
 
   /**
@@ -678,10 +690,10 @@ zUtils.assign(DP, {
     var month = this.getMonth(),
         year;
     if (month !== 1) {
-      return perMonthDays[month];
+      return perMonthDays[month]
     }
     year = this.getFullYear();
-    return year % 4 || !(year % 400) ? 28 : 29;
+    return year % 4 || !(year % 400) ? 28 : 29
   },
 
   /**
@@ -692,10 +704,10 @@ zUtils.assign(DP, {
     var quarter = this.getQuarter(),
         year;
     if (quarter !== 1) {
-      return perQuarterDays[quarter - 1];
+      return perQuarterDays[quarter - 1]
     }
     year = this.getFullYear();
-    return year % 4 || !(year % 400) ? 90 : 91;
+    return year % 4 || !(year % 400) ? 90 : 91
   },
 
   /**
@@ -704,7 +716,7 @@ zUtils.assign(DP, {
    */
   getYearDays: function getYearDays () {
     var year = this.getFullYear();
-    return year % 4 || !(year % 400) ? 365 : 366;
+    return year % 4 || !(year % 400) ? 365 : 366
   },
 
   /**
@@ -720,7 +732,7 @@ zUtils.assign(DP, {
     // 若本世纪元年为闰年，再加一天
     !(startYear % 400) && days++;
 
-    return days;
+    return days
   },
 
   /**
@@ -728,7 +740,7 @@ zUtils.assign(DP, {
    * @returns {number} range{1,4}
    */
   getQuarter: function getQuarter () {
-    return parseInt((this.getMonth() + 3) / 3);
+    return parseInt((this.getMonth() + 3) / 3)
   },
 
   /**
@@ -737,7 +749,7 @@ zUtils.assign(DP, {
    */
   getCentury: function getCentury () {
     var year = this.getFullYear();
-    return parseInt(year / 100);
+    return parseInt(year / 100)
   },
 
   /**
@@ -747,9 +759,9 @@ zUtils.assign(DP, {
   getQuarterDate: function getQuarterDate () {
     var month = this.getMonth(),
         days = month && this.getDaysPerMonth().slice(parseInt(month / 3) * 3, month).reduce(function (a, b) {
-              return a + b;
+              return a + b
             }, 0);
-    return days + this.getDate();
+    return days + this.getDate()
   },
 
   /**
@@ -759,9 +771,9 @@ zUtils.assign(DP, {
   getYearDate: function getYearDate () {
     var month = this.getMonth(),
         days = month && this.getDaysPerMonth().slice(0, month).reduce(function (a, b) {
-              return a + b;
+              return a + b
             }, 0);
-    return days + this.getDate();
+    return days + this.getDate()
   },
 
   /**
@@ -777,7 +789,7 @@ zUtils.assign(DP, {
     // 若本世纪元年为闰年，再加一天
     !(startYear % 400) && date++;
 
-    return date;
+    return date
   },
 
   /**
@@ -791,7 +803,7 @@ zUtils.assign(DP, {
     for(; --year > -1;) {
       year % 4 || year % 400 && date++;
     }
-    return date;
+    return date
   },
 
   /**
@@ -800,7 +812,7 @@ zUtils.assign(DP, {
    */
   isLeapYear: function isLeapYear () {
     var year = this.getFullYear();
-    return !(year % 4 || !(year % 400));
+    return !(year % 4 || !(year % 400))
   },
 
   /**
@@ -809,7 +821,7 @@ zUtils.assign(DP, {
    */
   isAverageYear: function isAverageYear () {
     var year = this.getFullYear();
-    return !!(year % 4) || !(year % 400);
+    return !!(year % 4) || !(year % 400)
   },
 
   /**
@@ -820,19 +832,19 @@ zUtils.assign(DP, {
   getDateByClassifier: function getDateByClassifier (classifier) {
     switch (classifier) {
       case "day":
-        return 1;
+        return 1
       case "week":
-        return this.getDay();
+        return this.getDay()
       case "month":
-        return this.getDate();
+        return this.getDate()
       case "quarter":
-        return this.getQuarterDate();
+        return this.getQuarterDate()
       case "year":
-        return this.getYearDate();
+        return this.getYearDate()
       case "century":
-        return this.getCenturyDate();
+        return this.getCenturyDate()
       default:
-        return 1;
+        return 1
     }
   },
 
@@ -844,19 +856,19 @@ zUtils.assign(DP, {
   getRestDaysByClassifier: function getRestDaysByClassifier (classifier) {
     switch (classifier) {
       case "day":
-        return 0;
+        return 0
       case "week":
-        return 6 - this.getDay();
+        return 6 - this.getDay()
       case "month":
-        return this.getMonthDays() - this.getDate();
+        return this.getMonthDays() - this.getDate()
       case "quarter":
-        return this.getQuarterDays() - this.getQuarterDate();
+        return this.getQuarterDays() - this.getQuarterDate()
       case "year":
-        return this.getYearDays() - this.getYearDate();
+        return this.getYearDays() - this.getYearDate()
       case "century":
-        return this.getCenturyDays() - this.getCenturyDate();
+        return this.getCenturyDays() - this.getCenturyDate()
       default:
-        return 0;
+        return 0
     }
   },
 
@@ -868,19 +880,19 @@ zUtils.assign(DP, {
   getDaysByClassifier: function getDaysByClassifier (classifier) {
     switch (classifier) {
       case "day":
-        return 1;
+        return 1
       case "week":
-        return 7;
+        return 7
       case "month":
-        return this.getMonthDays();
+        return this.getMonthDays()
       case "quarter":
-        return this.getQuarterDays();
+        return this.getQuarterDays()
       case "year":
-        return this.getYearDays();
+        return this.getYearDays()
       case "century":
-        return this.getCenturyDays();
+        return this.getCenturyDays()
       default:
-        return 1;
+        return 1
     }
   },
 
@@ -893,19 +905,19 @@ zUtils.assign(DP, {
   getDaysByPastClassifiers: function getDaysByPastClassifiers (classifier, number) {
     switch (classifier) {
       case "day":
-        return number;
+        return number
       case "week":
-        return 7 * number;
+        return 7 * number
       case "month":
-        return this.getDaysByPastMonths(number);
+        return this.getDaysByPastMonths(number)
       case "quarter":
-        return this.getDaysByPastQuarters(number);
+        return this.getDaysByPastQuarters(number)
       case "year":
-        return this.getDaysByPastYears(number);
+        return this.getDaysByPastYears(number)
       case "century":
-        return this.getDaysByPastCenturies(number);
+        return this.getDaysByPastCenturies(number)
       default:
-        return number;
+        return number
     }
   },
 
@@ -925,7 +937,7 @@ zUtils.assign(DP, {
       }
       days += Date.getMonthDays(month, year);
     }
-    return days;
+    return days
   },
 
   /**
@@ -944,7 +956,7 @@ zUtils.assign(DP, {
       }
       days += Date.getQuarterDays(quarter, year);
     }
-    return days;
+    return days
   },
 
   /**
@@ -958,7 +970,7 @@ zUtils.assign(DP, {
     for (; number > 0; number--) {
       days += Date.getYearDays(--year);
     }
-    return days;
+    return days
   },
 
   /**
@@ -972,7 +984,7 @@ zUtils.assign(DP, {
     for (; number > 0; number--) {
       days += Date.getCenturyDays(--century);
     }
-    return days;
+    return days
   },
 
   /**
@@ -984,19 +996,19 @@ zUtils.assign(DP, {
   getDaysByNextClassifiers: function getDaysByNextClassifiers (classifier, number) {
     switch (classifier) {
       case "day":
-        return number;
+        return number
       case "week":
-        return 7 * number;
+        return 7 * number
       case "month":
-        return this.getDaysByNextMonths(number);
+        return this.getDaysByNextMonths(number)
       case "quarter":
-        return this.getDaysByNextQuarters(number);
+        return this.getDaysByNextQuarters(number)
       case "year":
-        return this.getDaysByNextYears(number);
+        return this.getDaysByNextYears(number)
       case "century":
-        return this.getDaysByNextCenturies(number);
+        return this.getDaysByNextCenturies(number)
       default:
-        return number;
+        return number
     }
   },
 
@@ -1016,7 +1028,7 @@ zUtils.assign(DP, {
       }
       days += Date.getMonthDays(month, year);
     }
-    return days;
+    return days
   },
 
   /**
@@ -1035,7 +1047,7 @@ zUtils.assign(DP, {
       }
       days += Date.getQuarterDays(quarter, year);
     }
-    return days;
+    return days
   },
 
   /**
@@ -1049,7 +1061,7 @@ zUtils.assign(DP, {
     for (; number > 0; number--) {
       days += Date.getYearDays(++year);
     }
-    return days;
+    return days
   },
 
   /**
@@ -1063,7 +1075,7 @@ zUtils.assign(DP, {
     for (; number > 0; number--) {
       days += Date.getCenturyDays(++century);
     }
-    return days;
+    return days
   },
 
   // 获取当年第多少周
@@ -1128,7 +1140,7 @@ zUtils.assign(DP, {
       this.setWeek(config.week);
     }
 
-    return this;
+    return this
   },
 
   /**
@@ -1140,10 +1152,10 @@ zUtils.assign(DP, {
         r;
     if (n < 0) {
       r = (n - 10000).toString();
-      return r.charAt(0) + r.substr(2);
+      return r.charAt(0) + r.substr(2)
     } else {
       r = (n + 10000).toString();
-      return "+" + r.substr(1);
+      return "+" + r.substr(1)
     }
   },
 
@@ -1152,7 +1164,7 @@ zUtils.assign(DP, {
    * @return {String} The abbreviated time zone name (e.g. "EST")
    */
   getTimezone: function getTimezone () {
-    return Date.getTimezoneAbbreviation(this.getUTCOffset());
+    return Date.getTimezoneAbbreviation(this.getUTCOffset())
   },
 
   /**
@@ -1166,7 +1178,7 @@ zUtils.assign(DP, {
     // 一般而言，如果当地时间早于UTC时间(在UTC时区以东，例如亚洲地区)，则返回值为负；如果当地时间晚于UTC时间(在UTC时区以西，例如美洲地区)，则返回值为正。
     var here = this.getTimezoneOffset(),
         there = Number(offset) * -6 / 10;
-    return this.addMinutes(there - here);
+    return this.addMinutes(there - here)
   },
 
   /**
@@ -1175,7 +1187,7 @@ zUtils.assign(DP, {
    * @return {String} The abbreviated time zone name (e.g. "EST")
    */
   setTimezone: function setTimezone (offset) {
-    return this.setTimezoneOffset(Date.getTimezoneOffset(offset));
+    return this.setTimezoneOffset(Date.getTimezoneOffset(offset))
   },
 
   /**
@@ -1199,26 +1211,26 @@ zUtils.assign(DP, {
         l = a.length;
 
     format$1 = format$1.replace(ry, function (m) {
-      return (date.getFullYear() + '').substr(-m.length);
+      return (date.getFullYear() + '').substr(-m.length)
     });
 
     for (; i < l; i++) {
       format$1 = format$1.replace(a[i][0], function (m) {
         var p = date[a[i][1]]();
-        return (p > 9 || m.length < 2 ? '' : '0') + p;
+        return (p > 9 || m.length < 2 ? '' : '0') + p
       });
     }
 
     format$1 = format$1.replace(rS, function (m) {
       var S = date.getMilliseconds();
-      return (S > 99 || m.length < 3 ? '' : '0') + S;
+      return (S > 99 || m.length < 3 ? '' : '0') + S
     });
 
     format$1 = format$1.replace('q', function (m) {
-      return parseInt((date.getMonth() + 3) / 3);
+      return parseInt((date.getMonth() + 3) / 3)
     });
 
-    return format$1;
+    return format$1
   }
 
 });
@@ -1233,14 +1245,14 @@ zUtils.assign(DP, {
  */
 function validate (n, min, max, name) {
   if (n == null) {
-    return false;
+    return false
   }
   if (typeof n != "number") {
-    throw new TypeError(n + " is not a Number.");
+    throw new TypeError(n + " is not a Number.")
   } else if (n < min || n > max) {
-    throw new RangeError(n + " is not a valid value for " + name + ".");
+    throw new RangeError(n + " is not a valid value for " + name + ".")
   }
-  return true;
+  return true
 }
 
 /**
@@ -1271,47 +1283,47 @@ function parse2DatesByPeriod (period) {
   switch (period) {
     case 'today': // 今天
       diffStartDays = 0;
-      break;
+      break
     case 'yesterday': // 昨天
       diffStartDays = -1;
       diffEndDays = -1;
-      break;
+      break
     case 'thisWeek': // 本周
       diffStartDays = 1 - start.getDay();
-      break;
+      break
     case 'lastWeek': // 上周
       diffEndDays = -end.getDay();
       diffStartDays = diffEndDays + 1 - 7;
-      break;
+      break
     case 'thisMonth': // 本月
       diffStartDays = 1 - start.getDate();
-      break;
+      break
     case 'lastMonth': // 上月
       diffEndDays = -end.getDate();
       now.setDate(0);
       diffStartDays = diffEndDays + 1 - now.getMonthDays();
-      break;
+      break
     case 'thisQuarter': // 本季度
       diffStartDays = 1 - start.getQuarterDate();
-      break;
+      break
     case 'lastQuarter': // 上季度
       diffEndDays = -end.getQuarterDate();
       now.setDate(diffEndDays + now.getDate());
       diffStartDays = diffEndDays + 1 - now.getQuarterDays();
-      break;
+      break
     case 'thisYear': // 本年
       diffStartDays = 1 - start.getYearDate();
-      break;
+      break
     case 'lastYear': // 上年
       diffEndDays = -end.getYearDate();
       now.setFullYear(now.getFullYear() - 1);
       diffStartDays = diffEndDays + 1 - now.getYearDays();
-      break;
+      break
     default:
       // last7days, last30days, last90days, last365days...
       // last5months, last3Quarter, last2years, last1centuries...
       // past10days, past4months...
-      if (rPeriod.test(period) && (number = parseInt(RegExp.$2)) > 0) {
+      if (regexPeriod.test(period) && (number = parseInt(RegExp.$2)) > 0) {
         classifierPlural = RegExp.$3;
         if (classifier = Date.pluralClassifiers[classifierPlural]) {
 
@@ -1319,42 +1331,42 @@ function parse2DatesByPeriod (period) {
               // last 表示最近的天、周、月、季度、年、世纪数，分别对应包含今天、本周、本月、本季度、本年、本世纪
             case 'last':
               diffStartDays = -now.getDaysByPastClassifiers(classifier, number) + 1;
-              break;
+              break
               // past 表示过去的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
             case 'past':
               diffStartDays = -now.getDaysByPastClassifiers(classifier, number);
               thisClassifierDays = now.getDateByClassifier(classifier, number);
               diffStartDays -= thisClassifierDays - 1;
               diffEndDays -= thisClassifierDays;
-              break;
+              break
               // past 表示将来的天、周、月、季度、年、世纪数，分别对应不包含今天、本周、本月、本季度、本年、本世纪
             case 'next':
               diffEndDays = now.getDaysByNextClassifiers(classifier, number);
               thisClassifierDays = now.getRestDaysByClassifier(classifier, number);
               diffStartDays += thisClassifierDays + 1;
               diffEndDays += thisClassifierDays;
-              break;
+              break
             default:
           }
         }
       }
-      throw new Error('Unknown time period definition: ' + period);
+      throw new Error('Unknown time period definition: ' + period)
   }
   start.setDate(start.getDate() + diffStartDays);
   end.setDate(end.getDate() + diffEndDays);
 
-  return [start, end];
+  return [start, end]
 }
 
-zUtils.assign(DP, {
+Object.assign(DP, {
   getQuarterOrdinalDay: DP.getQuarterDate,
-  getYearOrdinalDay: DP.getQuarterDate,
-  getCenturyOrdinalDay: DP.getQuarterDate,
-  getADOrdinalDay: DP.getQuarterDate
+  getYearOrdinalDay: DP.getYearDate,
+  getCenturyOrdinalDay: DP.getCenturyDate,
+  getADOrdinalDay: DP.getADDate
 });
 
 // 扩展静态方法
-var core = zUtils.assign(Date, {
+var core = Object.assign(Date, {
 
   /**
    * 判断是否为日期对象
@@ -1362,7 +1374,7 @@ var core = zUtils.assign(Date, {
    * @returns {boolean}
    */
   isDate: function isDate (date) {
-    return zUtils.typeOf(date) === 'Date';
+    return typeOf(date) === 'Date'
   },
 
 
@@ -1372,7 +1384,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateMillisecond: function validateMillisecond (value) {
-    return validate(value, 0, 999, "millisecond");
+    return validate(value, 0, 999, "millisecond")
   },
 
   /**
@@ -1381,7 +1393,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateSecond: function validateSecond (value) {
-    return validate(value, 0, 59, "second");
+    return validate(value, 0, 59, "second")
   },
 
   /**
@@ -1390,7 +1402,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateMinute: function validateMinute (value) {
-    return validate(value, 0, 59, "minute");
+    return validate(value, 0, 59, "minute")
   },
 
   /**
@@ -1399,7 +1411,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateHour: function validateHour (value) {
-    return validate(value, 0, 23, "hour");
+    return validate(value, 0, 23, "hour")
   },
 
   /**
@@ -1408,7 +1420,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateDay: function validateDay (value) {
-    return validate(value, 0, 6, "day");
+    return validate(value, 0, 6, "day")
   },
 
   /**
@@ -1417,7 +1429,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateDate: function validateDate (value, month, year) {
-    return validate(value, 1, Date.getMonthDays(month, year), "date");
+    return validate(value, 1, Date.getMonthDays(month, year), "date")
   },
 
   /**
@@ -1426,7 +1438,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateMonth: function validateMonth (value) {
-    return validate(value, 0, 11, "month");
+    return validate(value, 0, 11, "month")
   },
 
   /**
@@ -1435,7 +1447,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateNaturalMonth: function validateNaturalMonth (value) {
-    return validate(value, 1, 12, "natural month");
+    return validate(value, 1, 12, "natural month")
   },
 
   /**
@@ -1444,7 +1456,7 @@ var core = zUtils.assign(Date, {
    * @return {Boolean}
    */
   validateYear: function validateYear (value) {
-    return validate(value, 0, 9999, "year");
+    return validate(value, 0, 9999, "year")
   },
 
   /**
@@ -1454,7 +1466,7 @@ var core = zUtils.assign(Date, {
   today: function today () {
     var date = new Date();
     date.setHours(0, 0, 0, 0);
-    return date;
+    return date
   },
 
   /**
@@ -1465,7 +1477,7 @@ var core = zUtils.assign(Date, {
   getDaysPerMonth: function getDaysPerMonth (year) {
     var d = perMonthDays.slice();
     Date.isLeapYear(year) && (d[1] = 29);
-    return d;
+    return d
   },
 
   /**
@@ -1475,7 +1487,7 @@ var core = zUtils.assign(Date, {
    * @returns {number} range{28, 31}
    */
   getMonthDays: function getMonthDays (month, year) {
-    return month !== 2 ? perMonthDays[month - 1] : year % 4 || !(year % 400) ? 28 : 29;
+    return month !== 2 ? perMonthDays[month - 1] : year % 4 || !(year % 400) ? 28 : 29
   },
 
   /**
@@ -1485,7 +1497,7 @@ var core = zUtils.assign(Date, {
    * @returns {number} range{28, 31}
    */
   getNaturalMonthDays: function getNaturalMonthDays (month, year) {
-    return month !== 1 ? perMonthDays[month] : year % 4 || !(year % 400) ? 28 : 29;
+    return month !== 1 ? perMonthDays[month] : year % 4 || !(year % 400) ? 28 : 29
   },
 
   /**
@@ -1495,7 +1507,7 @@ var core = zUtils.assign(Date, {
    * @returns {number} range{90, 92}
    */
   getQuarterDays: function getQuarterDays (quarter, year) {
-    return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91;
+    return quarter !== 1 ? perQuarterDays[quarter - 1] : year % 4 || !(year % 400) ? 90 : 91
   },
 
   /**
@@ -1504,7 +1516,7 @@ var core = zUtils.assign(Date, {
    * @returns {number} range{365,366}
    */
   getYearDays: function getYearDays (year) {
-    return year % 4 || !(year % 400) ? 365 : 366;
+    return year % 4 || !(year % 400) ? 365 : 366
   },
 
   /**
@@ -1520,7 +1532,7 @@ var core = zUtils.assign(Date, {
     // 若本世纪元年为闰年，再加一天
     !(startYear % 400) && days++;
 
-    return days;
+    return days
   },
 
   /**
@@ -1530,7 +1542,7 @@ var core = zUtils.assign(Date, {
    */
   getCenturyDaysByYear: function getCenturyDaysByYear (year) {
     var century = Date.getCentury(year);
-    return Date.getCenturyDays(century);
+    return Date.getCenturyDays(century)
   },
 
   /**
@@ -1539,7 +1551,7 @@ var core = zUtils.assign(Date, {
    * @returns {number}
    */
   getCentury: function getCentury (year) {
-    return parseInt(year / 100) + (year < 0 ? 1 : -1);
+    return parseInt(year / 100) + (year < 0 ? 1 : -1)
   },
 
   /**
@@ -1548,7 +1560,7 @@ var core = zUtils.assign(Date, {
    * @returns {boolean}
    */
   isLeapYear: function isLeapYear (year) {
-    return !(year % 4 || !(year % 400));
+    return !(year % 4 || !(year % 400))
   },
 
   /**
@@ -1557,7 +1569,7 @@ var core = zUtils.assign(Date, {
    * @returns {boolean}
    */
   isAverageYear: function isAverageYear (year) {
-    return !!(year % 4) || !(year % 400);
+    return !!(year % 4) || !(year % 400)
   },
 
   /**
@@ -1568,7 +1580,7 @@ var core = zUtils.assign(Date, {
   format: function format (time, format$1, timeFormat) {
     // 解析为时间对象
     var date = Date.parse2Date(time, timeFormat);
-    return date.format(format$1);
+    return date.format(format$1)
   },
 
   /**
@@ -1578,34 +1590,43 @@ var core = zUtils.assign(Date, {
    * @returns {Date}
    */
   parse2Date: function parse2Date (time, format) {
-    switch (zUtils.typeOf(time)) {
+    if (time == null) {
+      console.warn((time + " can not parse to date! use 0"));
+      return new Date(0)
+    }
+    switch (typeOf(time)) {
         // 若为毫秒数
       case 'Number':
-        return new Date(time);
+        return new Date(time)
         // 若为日期对象
       case 'Date':
-        return time.format(format);
+        return time.format(format)
+      // 若为字符串
+      case 'String':
+        // 若全为数字
+        if (!/\D/.test(time)) { return new Date(time) }
+        break
+      default:
+        // 其他统一作转化为字符串处理
+        time = String(time);
     }
-    // 统一作转化为字符串处理
-    time = String(time);
 
     // 若能正确解析，返回该时间的毫秒数
     // 若不能正确解析，返回NaN
     var M = Date.parse(time);
     if (M === M) {
-      return new Date(M);
+      return new Date(M)
     }
 
     format = format ? format.replace(rMdhms_g, function (m) {
-          return (m = m.charAt(0)) + m;
+          return (m = m.charAt(0)) + m
         }) : Date.FORMAT;
 
     time = time.replace(rDigits_g, function (m) {
-      return m.length < 2 ? '0' + m : m;
+      return m.length < 2 ? '0' + m : m
     });
 
-    var r, m, n,
-        d = new Date,
+    var r, m, d = new Date,
         a = [
           [ry_g, "setFullYear"] //year
           ,
@@ -1630,7 +1651,7 @@ var core = zUtils.assign(Date, {
       d[m](r.test(format) ? parseInt(time.slice(r.lastIndex - RegExp.lastMatch.length, r.lastIndex)) || 0 : 0);
       r.lastIndex = 0;
     }
-    return d;
+    return d
   },
 
   /**
@@ -1645,7 +1666,7 @@ var core = zUtils.assign(Date, {
     return [
       dates[0].format(format),
       dates[1].format(format)
-    ];
+    ]
   },
 
   /**
@@ -1654,7 +1675,7 @@ var core = zUtils.assign(Date, {
    * @returns {Array.<Date>}
    */
   parse2DateObjectsByPeriod: function parse2DateObjectsByPeriod (period) {
-    return parse2DatesByPeriod(period);
+    return parse2DatesByPeriod(period)
   },
 
   /**
@@ -1667,10 +1688,10 @@ var core = zUtils.assign(Date, {
         timezones = CultureInfo.timezones;
     for (var i = 0, l = timezones.length; i < l; i++) {
       if (timezones[i].offset === offset) {
-        return timezones[i].name;
+        return timezones[i].name
       }
     }
-    return null;
+    return null
   },
 
   /**
@@ -1683,10 +1704,10 @@ var core = zUtils.assign(Date, {
         timezones = CultureInfo.timezones;
     for (var i = 0, l = timezones.length; i < l; i++) {
       if (timezones[i].name === name.toUpperCase()) {
-        return timezones[i].offset;
+        return timezones[i].offset
       }
     }
-    return null;
+    return null
   },
 
   FORMAT: 'yyyy-MM-dd hh:mm:ss SSS',
@@ -1711,13 +1732,13 @@ var core = zUtils.assign(Date, {
   },
 
   // 匹配时段语句的正则表达式
-  rPeriod: rPeriod,
+  regexPeriod: regexPeriod,
 
   CultureInfos: CultureInfos,
   getCultureInfo: getCultureInfo,
 
 });
 
-exports['default'] = core;
 exports.CultureInfos = CultureInfos;
+exports.default = core;
 exports.getCultureInfo = getCultureInfo;
