@@ -1,6 +1,6 @@
 {
   "name": "@zbm1/date",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "javascript Date Object extend",
   "scripts": {
     "dev": "node rollup",

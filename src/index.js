@@ -1,1 +1,1 @@
-export {default, CultureInfos, getCultureInfo} from './core'
+export {default} from './core'

@@ -918,6 +918,7 @@ function parse2DatesByPeriod (period) {
       // last7days, last30days, last90days, last365days...
       // last5months, last3Quarter, last2years, last1centuries...
       // past10days, past4months...
+      var number
       if (regexPeriod.test(period) && (number = parseInt(RegExp.$2)) > 0) {
         classifierPlural = RegExp.$3
         if (classifier = Date.pluralClassifiers[classifierPlural]) {
@@ -961,7 +962,7 @@ Object.assign(DP, {
 })
 
 // 扩展静态方法
-export default Object.assign(Date, {
+Object.assign(Date, {
 
   /**
    * 判断是否为日期对象
@@ -1377,3 +1378,5 @@ export default Object.assign(Date, {
   getCultureInfo,
 
 })
+
+export default Date
