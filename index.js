@@ -1,6 +1,6 @@
 /*
- * @name: z-date
- * @version: 1.3.2
+ * @name: @zbm1/date
+ * @version: 1.3.4
  * @description: javascript Date Object extend
  * @author: zbm2001@aliyun.com
  * @license: Apache 2.0
@@ -1231,6 +1231,38 @@ Object.assign(DP, {
     });
 
     return format$1
+  },
+
+  /**
+   * 返回格式化后的日期格式
+   * @returns {string}
+   */
+  formatDate: function formatDate () {
+    return this.format(Date.FORMAT_DATE)
+  },
+
+  /**
+   * 返回格式化后的日期时间格式
+   * @returns {string}
+   */
+  formatDatetime: function formatDatetime () {
+    return this.format(Date.FORMAT_DATETIME)
+  },
+
+  /**
+   * 返回格式化后的时间格式
+   * @returns {string}
+   */
+  formatTime: function formatTime () {
+    return this.format(Date.FORMAT_TIME)
+  },
+
+  /**
+   * 返回格式化后的 UTC 格式
+   * @returns {string}
+   */
+  formatUTC: function formatUTC () {
+    return this.toUTCString ? this.toUTCString() : this.format(Date.FORMAT_UTC)
   }
 
 });
@@ -1575,12 +1607,54 @@ var core = Object.assign(Date, {
   /**
    * 格式化日期对象、时间毫秒数、时间格式字符串表述的转换
    * @param {Date|Number|String} time 日期对象、时间毫秒数、时间格式字符串表述
+   * @param {String} format 格式化模式匹配表述
+   * @param {String} timeFormat 反序列化为 Date 对象的模式匹配表述（只在 time 为时间格式字符串表述时应用）
    * @returns {String}
    */
   format: function format (time, format$1, timeFormat) {
     // 解析为时间对象
     var date = Date.parse2Date(time, timeFormat);
     return date.format(format$1)
+  },
+
+  /**
+   * 格式化日期对象、时间毫秒数、时间格式字符串表述的转换，返回日期格式字符串
+   * @param {Date|Number|String} time 日期对象、时间毫秒数、时间格式字符串表述
+   * @param {String} timeFormat 反序列化为 Date 对象的模式匹配表述（只在 time 为时间格式字符串表述时应用）
+   * @returns {string}
+   */
+  formatDate: function formatDate (time, timeFormat) {
+    return Date.format(time, Date.FORMAT_DATE, timeFormat)
+  },
+
+  /**
+   * 格式化日期对象、时间毫秒数、时间格式字符串表述的转换，返回日期时间格式字符串
+   * @param {Date|Number|String} time 日期对象、时间毫秒数、时间格式字符串表述
+   * @param {String} timeFormat 反序列化为 Date 对象的模式匹配表述（只在 time 为时间格式字符串表述时应用）
+   * @returns {string}
+   */
+  formatDatetime: function formatDatetime (time, timeFormat) {
+    return Date.format(time, Date.FORMAT_DATETIME, timeFormat)
+  },
+
+  /**
+   * 格式化日期对象、时间毫秒数、时间格式字符串表述的转换，返回时间格式字符串
+   * @param {Date|Number|String} time 日期对象、时间毫秒数、时间格式字符串表述
+   * @param {String} timeFormat 反序列化为 Date 对象的模式匹配表述（只在 time 为时间格式字符串表述时应用）
+   * @returns {string}
+   */
+  formatTime: function formatTime (time, timeFormat) {
+    return Date.format(time, Date.FORMAT_TIME, timeFormat)
+  },
+
+  /**
+   * 格式化日期对象、时间毫秒数、时间格式字符串表述的转换，返回 UTC 时间格式字符串
+   * @param {Date|Number|String} time 日期对象、时间毫秒数、时间格式字符串表述
+   * @param {String} timeFormat 反序列化为 Date 对象的模式匹配表述（只在 time 为时间格式字符串表述时应用）
+   * @returns {string}
+   */
+  formatUTC: function formatUTC (time, timeFormat) {
+    return Date.format(time, Date.FORMAT_UTC, timeFormat)
   },
 
   /**
@@ -1713,8 +1787,9 @@ var core = Object.assign(Date, {
   FORMAT: 'yyyy-MM-dd hh:mm:ss SSS',
   FORMAT_DATE: 'yyyy-MM-dd',
   FORMAT_DATETIME: 'yyyy-MM-dd hh:mm:ss',
+  FORMAT_TIME: 'hh:mm:ss',
 
-  UTC_FORMAT: 'yyyy-MM-ddThh:mm:ss.SSSZ',
+  FORMAT_UTC: 'yyyy-MM-ddThh:mm:ss.SSSZ',
 
   // Hash表：时间量词复数词对应原词
   // 毫秒、秒、分钟、小时、天、周、月、季度、年、世纪
